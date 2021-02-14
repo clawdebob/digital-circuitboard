@@ -1,0 +1,88 @@
+{
+  "main-menu": {
+    "options": {
+      "save-as-svg": "Save as SVG",
+      "save-as-png": "Save as PNG",
+      "file": {
+        "new": "New",
+        "open": "Open",
+        "save": "Save"
+      }
+    },
+    "export": "Export",
+    "file": "File"
+  },
+  "action": {
+    "create-out-contact": "Create out contact",
+    "create-button": "Create button",
+    "edit": "Edit",
+    "interact": "Interact"
+  },
+  "properties": "{{element}} properties",
+  "value": "Value",
+  "name": "Name",
+  "yes": "Yes",
+  "no": "No",
+  "elements": {
+    "and": "AND",
+    "buffer": "Buffer",
+    "button": "Button",
+    "constant": "Constant",
+    "invertor": "Invertor",
+    "nand": "NAND",
+    "nor": "NOR",
+    "nxor": "NXOR",
+    "or": "OR",
+    "outcontact": "Out contact",
+    "xor": "XOR",
+    "label": "Label"
+  },
+  "error": "Error",
+  "gdrive": {
+    "error": {
+      "code": "Invalid Code",
+      "file-loading": "Error loading file",
+      "file-save": "Error saving file to Google Drive",
+      "login": "Auth failed",
+      "logout": "Logout failed",
+      "unknown": "Google Drive Service Unavailable"
+    },
+    "fs": {
+      "empty": "Current folder is empty",
+      "login-message": "You should log in to Google to access drive",
+      "success-save": "File saved to Google Drive",
+      "upper": "To upper level",
+      "warning": "Please sign in to Google Drive"
+    },
+    "login": "Sign in",
+    "logout": "Sign out",
+    "manage": "Manage account",
+    "paste": "Paste your code here:",
+    "submit": "Submit",
+    "success": {
+      "login": "Successfully Logged in to Google Account",
+      "logout": "Log out successful"
+    },
+    "title": "Google account management"
+  },
+  "groups": {
+    "base": "Base",
+    "gates": "Gates",
+    "io": "Input/Output",
+    "other": "Other"
+  },
+  "loading": "Loading",
+  "loading-file": "Loading {{file}}",
+  "notice": "Notice",
+  "props": {
+    "color": "Color",
+    "current-value": "Current value",
+    "in": "Number of In contacts",
+    "initial-value": "Initial value",
+    "invert": "Invert",
+    "name": "Name",
+    "font-size": "Font size"
+  },
+  "select-language": "Select language",
+  "warning": "Warning!"
+}

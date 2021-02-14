@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   width="40"
+   height="40"
+   viewBox="0 0 10.583333 10.583333"
+   version="1.1"
+   id="svg8"
+>
+  <defs id="defs2">
+  </defs>
+  <metadata
+     id="metadata5">
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(0,-286.41666)">
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.13229167;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke"
+       id="rect815"
+       width="6.6145835"
+       height="7.9375"
+       x="1.984375"
+       y="287.73956" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.13229167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 8.6361465,291.47085 c 0.3590052,0 0.7153645,0 1.069078,0"
+       id="path825"
+       transform="matrix(0.9899496,0,0,1,0.0496086,0.17133083)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.13229167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 8.6361465,291.47085 c 0.3590052,0 0.7153645,0 1.069078,0"
+       id="path825-6"
+       transform="matrix(0.9899496,0,0,1,-7.6233081,2.8171642)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.13229167;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 8.6361465,291.47085 c 0.3590052,0 0.7153645,0 1.069078,0"
+       id="path825-6-5"
+       transform="matrix(0.9899496,0,0,1,-7.6233081,-2.4745025)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.17499995px;line-height:1.25;font-family:Ubuntu;-inkscape-font-specification:Ubuntu;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="4.5101728"
+       y="291.08664"
+       id="text976"><tspan
+         id="tspan974"
+         x="4.5101728"
+         y="291.08664"
+         style="font-size:3.17499995px;stroke-width:0.26458332">1</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,72 @@
+@import "src/styles/variables";
+
+.element-details {
+  border-collapse: collapse;
+  width: 80%;
+  background-color: white;
+
+  margin: 0 auto;
+
+  &__wrapper {
+    width: 100%;
+    background-color: $menu-color;
+    flex: 1 0;
+    padding: 20px 0;
+  }
+
+  &__title {
+    font-weight: bold;
+    margin: 5px 0;
+  }
+
+  th, td {
+    border: 1px solid;
+    padding: 0;
+    width: 50%;
+  }
+
+  tr {
+    td {
+      max-width: 50px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+
+      .prop-name {
+        padding: 0 5px;
+        box-sizing: border-box;
+      }
+
+      input[type=text] {
+        box-sizing: border-box;
+        padding: 2px 3px 1px;
+        text-align: right;
+
+        &:focus {
+          text-align: left;
+        }
+      }
+
+      .prop-input {
+        border: none;
+        width: 100%;
+        padding: 2px 0 1px;
+        background-color: white;
+
+        &:focus {
+          outline: none;
+          text-align: left;
+          background-color: white;
+
+          &:hover {
+            background-color: white;
+          }
+        }
+
+        &:hover {
+          background-color: $menu-hover;
+        }
+      }
+    }
+  }
+}

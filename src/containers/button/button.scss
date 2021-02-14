@@ -1,0 +1,56 @@
+$border-size: 2px;
+$button-primary-color: deepskyblue;
+$button-secondary-color: aliceblue;
+
+.button {
+  font-size: 1.4em;
+  border-radius: 16px;
+  padding: 4px 15px;
+  outline: none;
+  background-color: deepskyblue;
+  border: $border-size solid deepskyblue;
+  color: white;
+  display: block;
+
+  &:hover {
+    background-color: darkblue;
+    color: aliceblue;
+    cursor: pointer;
+    border: $border-size solid darkblue;
+  }
+
+  &:active {
+    border: $border-size inset $button-primary-color;
+  }
+
+  &--disabled,
+  &--disabled:active,
+  &--disabled:hover {
+    background-color: lightgrey;
+    border-color: grey;
+    color: grey;
+    box-shadow: none;
+    cursor: initial;
+    opacity: 0.3;
+  }
+
+  &--primary {
+    background-color: $button-primary-color;
+    color: $button-secondary-color;
+
+    &:active {
+      background-color: $button-primary-color;
+      color: $button-secondary-color;
+    }
+  }
+
+  &--regular {
+    background-color: $button-secondary-color;
+    color: $button-primary-color;
+
+    &:active {
+      background-color: $button-secondary-color;
+      color: $button-primary-color;
+    }
+  }
+}

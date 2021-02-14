@@ -1,0 +1,142 @@
+@import "src/styles/variables";
+
+.scheme-title {
+  border: none;
+  flex: 1;
+  background-color: $menu-color;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  padding: 2px 3px 1px;
+
+  &--visible {
+    display: block;
+    user-select: none;
+  }
+
+  &--hidden {
+    display: none;
+  }
+
+  &__wrapper {
+    display: flex;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin: 10px 15px 0;
+  }
+
+  &__input {
+    background-color: white;
+    font-size: 16px;
+    font-weight: normal;
+    display: none;
+    width: 100%;
+  }
+
+  &:hover {
+    background-color: $menu-hover;
+  }
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  margin: 9px;
+  border-radius: 10px;
+
+  &-block {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.main-menu {
+  padding: 0 10px;
+  margin: 5px 0;
+  font-size: 15px;
+  white-space: nowrap;
+
+  &__wrapper {
+    background-color: $menu-color;
+    width: 100%;
+    display: flex;
+    border-bottom: 1px solid;
+    top: 0;
+    left: 0;
+    justify-content: space-between;
+  }
+
+  &__section {
+    display: inherit;
+  }
+
+  &__option-list {
+    text-decoration-style: unset;
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: $menu-hover;
+    }
+
+    &--opened {
+      background-color: $menu-hover;
+    }
+
+    &--closed {
+      background-color: $menu-color;
+    }
+  }
+
+  &__option {
+    margin: 0 5px;
+    padding: 5px 4px;
+  }
+}
+
+.suboptions {
+  display: block;
+  position: absolute;
+  background-color: $menu-color;
+  border: 1px solid;
+  padding: 0;
+  min-width: 200px;
+  z-index: 2;
+
+  &__option {
+    margin: 0;
+    display: block;
+    border-bottom: 1px solid black;
+
+    &:hover {
+      background-color: $menu-hover;
+      cursor: pointer;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__entry {
+    padding: 3px 30px;
+    display: inline-block;
+  }
+
+  &__name {
+    text-align: left;
+  }
+
+  &__hotkey {
+    text-align: left;
+    color: aliceblue;
+    float: right;
+  }
+}
+
+.extras__section {
+  display: inherit;
+  align-items: flex-end;
+}
