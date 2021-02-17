@@ -6,7 +6,7 @@ import './board.scss';
 import {DcbElement} from '../../elements/dcbElement';
 import Renderer from '../../utils/renderer';
 import {fromEvent, Observable, of, Subscription} from 'rxjs';
-import {pluck, switchMap} from 'rxjs/operators';
+import {filter, pluck, skipUntil, skipWhile, switchMap, tap} from 'rxjs/operators';
 
 export interface BoardProps {
   boardState: BoardState,
@@ -17,34 +17,26 @@ const Board = (props: BoardProps) => {
   console.log(props.currentElement);
   const boardWrapper = useRef<HTMLDivElement>(null);
   const boardContainer = useRef<HTMLDivElement>(null);
-  const zoomObservable = useRef<Subscription | null>(null);
+  const zoom = useRef<number>(100);
 
   useEffect(() => {
     if (boardWrapper.current && boardContainer.current && !Renderer.board) {
       Renderer.init(boardWrapper.current as HTMLElement);
 
-      const wheelHandler$ = fromEvent(boardContainer.current, 'wheel');
-
-      fromEvent(document, 'keydown')
+      fromEvent<React.WheelEvent>(boardContainer.current, 'wheel')
         .pipe(
-          pluck('key'),
-        ).subscribe(key => {
-          if (key === 'Control') {
-            zoomObservable.current = wheelHandler$.subscribe(e => {
-              e.preventDefault();
-            });
+          filter(e => e.ctrlKey)
+        ).subscribe(e => {
+          e.preventDefault();
+
+          const zoomStep = e.deltaY < 0 ? 10 : -10;
+          const nextZoomVal = zoom.current + zoomStep;
+
+          if (nextZoomVal >= 20 && nextZoomVal <= 200) {
+            zoom.current = nextZoomVal;
+            Renderer.setBoardZoom(zoom.current);
           }
         });
-
-      fromEvent(document, 'keyup')
-        .pipe(
-          pluck('key'),
-        ).subscribe(key => {
-          if (key === 'Control' && zoomObservable.current) {
-            zoomObservable.current.unsubscribe();
-            zoomObservable.current = null;
-          }
-      });
     }
   });
 

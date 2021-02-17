@@ -30,11 +30,21 @@ class Renderer {
 
     this.background.add(this.createRect(500,500,1000,1000)
       .addClass('field-piece')
-      .fill('url(#grid-pattern)'));
+      .fill('url(#grid-pattern)')
+    );
   }
 
   public static createRect(x: number, y: number, width: number, height: number): Rect {
     return this.svg.rect(width, height).x(x).y(y);
+  }
+
+  public static setBoardZoom(zoom: number): void {
+    this.board.transform({scaleX: zoom / 100, scaleY: zoom / 100});
+    const {width, height} = this.svg.node.getBoundingClientRect();
+
+    // this.svg.size(width, height);
+
+    console.log();
   }
 }
 

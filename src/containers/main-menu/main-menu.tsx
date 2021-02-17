@@ -57,7 +57,6 @@ const MainMenu = (props: MainMenuProps) => {
         <div className="logo-block">
           <Logo className="logo"/>
         </div>
-        <img src="../../assets/tile5px.png"></img>
         <div className="menu-block">
           <div
             className="scheme-title__wrapper"
