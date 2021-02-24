@@ -180,7 +180,8 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
                 <input
                   type={inputType}
                   defaultValue={String(currentElement.props[prop])}
-                  onFocus={(e: React.FocusEvent<HTMLInputElement>) => handleFocus(e, prop)}
+                  onFocus={inputType === 'color' ? _.noop : (e: React.FocusEvent<HTMLInputElement>) => handleFocus(e, prop)}
+                  onChange={inputType === 'color' ? e => updateElementState(prop, e.target.value) : _.noop}
                   name={prop}
                   className="prop-input"
                   key={key}
