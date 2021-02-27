@@ -24,6 +24,8 @@ export class Pin implements PinProps {
   public wiredTo: Wired;
   public valueUpdate = new BehaviorSubject(false);
   public observable: Observable<boolean>;
+  public model?: Line;
+  public helper?: Circle;
 
   constructor(
     positionData: PositionData,

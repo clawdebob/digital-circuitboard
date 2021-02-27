@@ -4,12 +4,15 @@ import {BOARD_STATES_ENUM, BoardState} from '../types/consts/boardStates.consts'
 import {Element} from '@svgdotjs/svg.js';
 import {DcbElement} from '../elements/dcbElement';
 import React from 'react';
+import * as _ from 'lodash';
 
 export class BoardInteractor {
   private static eventSubscription = new Subscription();
   private static svg: SVGSVGElement;
   private static ghost: Element | null;
   private static currentElement: DcbElement | null;
+  private static elementsList: Array<DcbElement> = [];
+  private static idCounter = 0;
   private static coords = {
     x1: 0,
     y1: 0,
@@ -69,7 +72,33 @@ export class BoardInteractor {
       this.ghost = null;
     }
 
-    this.ghost = Renderer.makeElement(this.currentElement, x, y, true);
+    this.ghost = Renderer.makeElementBase(this.currentElement, x, y, true);
+  }
+
+  private static createElement(e: React.MouseEvent): void {
+    e.preventDefault();
+
+    if (!this.currentElement) {
+      return;
+    }
+
+    const element = _.cloneDeep(this.currentElement);
+
+    Renderer.createElement(element, this.coords.x1, this.coords.y1);
+
+    element.id = `${element.name} ${this.idCounter}`;
+
+    this.idCounter++;
+    this.elementsList.push(element);
+
+
+    console.log(this.elementsList);
+  }
+
+  private static applySubscriptions(...args: Array<Subscription>): void {
+    _.forEach(args, subscription => {
+      this.eventSubscription.add(subscription);
+    });
   }
 
   public static setState(boardState: BoardState, element: DcbElement | null): void {
@@ -78,11 +107,12 @@ export class BoardInteractor {
 
     switch (boardState) {
       case BOARD_STATES_ENUM.CREATE:
-        this.eventSubscription.add(
+        this.applySubscriptions(
           fromEvent<React.MouseEvent>(this.svg, 'mousemove')
-            .subscribe(e => this.drawElementGhost(e))
+            .subscribe(e => this.drawElementGhost(e)),
+          fromEvent<React.MouseEvent>(this.svg, 'click')
+            .subscribe(e => this.createElement(e))
         );
-        // fromEvent(Renderer.svg.node, 'mousemove').subscribe(console.log);
         break;
       case BOARD_STATES_ENUM.EDIT:
       default:

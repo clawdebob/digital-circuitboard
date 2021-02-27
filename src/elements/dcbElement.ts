@@ -30,7 +30,7 @@ export interface PositionData {
 }
 
 interface ModelData {
-  model: G;
+  model: G | null;
   signatureModel?: Text;
   interactionModel?: G;
 }
@@ -43,7 +43,7 @@ export interface ElementParams {
   isSelected: boolean;
   signature?: string;
   dimensions: Dimensions;
-  modelData?: ModelData;
+  modelData: ModelData;
   props: ElementProperties;
   editableProps: Array<ElementProperty>;
   positionData: PositionData;
@@ -61,9 +61,13 @@ export abstract class DcbElement implements ElementParams {
   public dimensions: Dimensions;
   public editableProps: Array<ElementProperty>;
   public props: ElementProperties;
+  public modelData: ModelData = {
+    model: null,
+  };
   public maxContacts = 0;
   public inPins: Array<Pin>;
   public outPins: Array<Pin>;
+  public signature?: string;
 
   protected constructor(
     name: DcbElementName,
@@ -108,7 +112,7 @@ export abstract class DcbElement implements ElementParams {
     const pivotPoint = Math.round(maxPoints / 2);
 
     for (let y1 = 0; y1 < availableLen; y1 += PIN_LENGTH) {
-      pointsArray.push(y1);
+      pointsArray.push(y1 + 1);
     }
 
     const yPositions = [];
@@ -130,10 +134,10 @@ export abstract class DcbElement implements ElementParams {
     }
 
     if (numberOfPins % 2 !== 0) {
-      yPositions.push(pointsArray[pivotPoint - 1] + 1);
+      yPositions.push(pointsArray[pivotPoint - 1]);
     }
 
-    return _.map(yPositions.sort(), y => y++);
+    return yPositions.sort();
   }
 
   private getInPins(): Array<Pin> {
