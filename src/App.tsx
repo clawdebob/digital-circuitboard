@@ -4,6 +4,7 @@ import Board from './containers/board/board';
 import * as _ from 'lodash';
 import MainMenu from './containers/main-menu/main-menu';
 import SideMenu from './containers/side-menu/side-menu';
+import ActionPanel from './containers/action-panel/action-panel';
 
 const MAIN_MENU_OPTIONS = [
   {
@@ -34,14 +35,8 @@ const MAIN_MENU_OPTIONS = [
 function App(): React.ReactElement {
   return (
     <div className="app">
-      <MainMenu
-        options={MAIN_MENU_OPTIONS}
-      />
-      {/*<Button*/}
-      {/*  id={'test'}*/}
-      {/*  text={'warning'}*/}
-      {/*  onClick={() => dispatch(setBoardState(BOARD_STATES_ENUM.INTERACT))}*/}
-      {/*/>*/}
+      <MainMenu options={MAIN_MENU_OPTIONS}/>
+      <ActionPanel/>
       <div className="drawing-area">
         <SideMenu/>
         <Board/>

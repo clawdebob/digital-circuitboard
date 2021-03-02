@@ -79,8 +79,6 @@ export abstract class DcbElement implements ElementParams {
     this.name = name;
 
     this.className = `element-${name} element`;
-    // this.nonEditableProps = nonEditableProps;
-    // this.editableProps = editableProps;
 
     this.props = props;
     this.editableProps = editableProps;
@@ -88,9 +86,8 @@ export abstract class DcbElement implements ElementParams {
     const height = dimensions.height;
     const originY = dimensions.originY;
     const availableLen = height - (2 * originY);
-    const maxPoints = Math.round(availableLen / 10);
 
-    this.maxContacts = maxPoints;
+    this.maxContacts = Math.round(availableLen / 10);
     this.inPins = this.getInPins();
     this.outPins = this.getOutPins();
   }
