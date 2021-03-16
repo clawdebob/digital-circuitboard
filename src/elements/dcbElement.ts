@@ -2,7 +2,7 @@ import {G, Text} from '@svgdotjs/svg.js';
 import {DIRECTION, ElementDirection, ElementOrientation, ORIENTATION} from '../types/consts/orientation.const';
 import {ElementProperties, ElementProperty} from '../types/consts/elementDetails.consts';
 import * as _ from 'lodash';
-import {Pin} from './Pin/pin';
+import {Pin, PIN_TYPES_ENUM} from './Pin/pin';
 import {DcbElementName} from '../types/consts/element.consts';
 
 const PIN_LENGTH = 12;
@@ -157,6 +157,8 @@ export abstract class DcbElement implements ElementParams {
         ...this.positionData,
         coords
       },
+      PIN_TYPES_ENUM.IN,
+      idx,
       _.get(this.inPins, `[${idx}].value`, undefined),
       _.get(this.inPins, `[${idx}].invert`, false),
       _.get(this.inPins, `[${idx}].wiredTo`, null),
@@ -184,6 +186,8 @@ export abstract class DcbElement implements ElementParams {
         ...this.positionData,
         coords
       },
+      PIN_TYPES_ENUM.OUT,
+      idx,
       _.get(this.outPins, `[${idx}].value`, undefined),
       _.get(this.outPins, `[${idx}].invert`, false),
       _.get(this.outPins, `[${idx}].wiredTo`, null),

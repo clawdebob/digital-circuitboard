@@ -5,6 +5,11 @@ import {BehaviorSubject, Observable} from 'rxjs';
 export type Signal = boolean | null | undefined;
 export type Wired = DcbElement | null;
 
+export enum PIN_TYPES_ENUM {
+  IN = 'IN',
+  OUT = 'OUT'
+}
+
 interface PinProps {
   positionData: PositionData;
   value: Signal,
@@ -15,6 +20,8 @@ interface PinProps {
   wiredTo: Wired,
   valueUpdate: BehaviorSubject<boolean>,
   observable: Observable<boolean>,
+  type: PIN_TYPES_ENUM,
+  index: number,
 }
 
 export class Pin implements PinProps {
@@ -24,11 +31,15 @@ export class Pin implements PinProps {
   public wiredTo: Wired;
   public valueUpdate = new BehaviorSubject(false);
   public observable: Observable<boolean>;
+  public type: PIN_TYPES_ENUM;
+  public index: number;
   public model?: Line;
   public helper?: Circle;
 
   constructor(
     positionData: PositionData,
+    type: PIN_TYPES_ENUM,
+    index = -1,
     value: Signal = undefined,
     invert = false,
     wiredTo: Wired = null,
@@ -38,5 +49,7 @@ export class Pin implements PinProps {
     this.invert = invert;
     this.observable = new Observable<boolean>();
     this.wiredTo = wiredTo;
+    this.type = type;
+    this.index = index;
   }
 }

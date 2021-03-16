@@ -1,4 +1,4 @@
-import {Svg, G, Element, SVG, Rect} from '@svgdotjs/svg.js';
+import {Svg, G, Element, SVG, Rect, Circle, Line} from '@svgdotjs/svg.js';
 import tile from '../assets/tile5px.png';
 import * as _ from 'lodash';
 import {DcbElement} from '../elements/dcbElement';
@@ -36,6 +36,12 @@ class Renderer {
       .y(y);
   }
 
+  public static createCircle(x: number, y: number, diameter: number): Circle {
+    return this.svg.circle(diameter)
+      .x(x)
+      .y(y);
+  }
+
   public static makeElementBase(element: DcbElement, x: number, y: number, isGhost = false): Element {
     const {props, dimensions} = element;
     const {fill} = props;
@@ -57,6 +63,26 @@ class Renderer {
     return rect;
   }
 
+  private static createHelper(x: number, y: number): Circle {
+    const diameter = 10;
+
+    return this.createCircle(x  - diameter / 2, y - diameter / 2, diameter)
+      .addClass('help-circle')
+      .opacity(0)
+      .fill('#00000000')
+      .stroke('#14ff53');
+  }
+
+  public static createWireGhost(x1: number, y1: number, x2: number, y2: number): Line {
+    return this.svg.line([x1, y1, x2, y2])
+      .opacity(0.5)
+      .stroke({
+        color: '#000000',
+        width: 2
+      })
+      .addTo(this.middleGround);
+  }
+
   public static createElement(element: DcbElement, x: number, y: number): void {
     const group = this.background.group();
     const base = this.makeElementBase(element, x, y);
@@ -72,6 +98,7 @@ class Renderer {
           endCoords.x + x,
           endCoords.y + y,
         );
+        const helper = this.createHelper(startCoords.x + x, startCoords.y + y);
 
         line.opacity(1);
         line.stroke({
@@ -79,15 +106,17 @@ class Renderer {
           width: 2
         });
         group.add(line);
+        this.foreground.add(helper);
 
         return {
           ...pin,
-          model: line
+          model: line,
+          helper,
         };
       });
     }
 
-    if(element.outPins.length) {
+    if (element.outPins.length) {
       element.outPins = _.map(element.outPins, pin => {
         const [startCoords, endCoords] = pin.positionData.coords;
         const line = this.background.line(
@@ -96,6 +125,7 @@ class Renderer {
           endCoords.x + x,
           endCoords.y + y,
         );
+        const helper = this.createHelper(endCoords.x + x, endCoords.y + y);
 
         line.opacity(1);
         line.stroke({
@@ -103,10 +133,12 @@ class Renderer {
           width: 2
         });
         group.add(line);
+        this.foreground.add(helper);
 
         return {
           ...pin,
-          model: line
+          model: line,
+          helper
         };
       });
     }

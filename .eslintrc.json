@@ -28,7 +28,7 @@
     "no-undef": 0,
     "no-console": 1,
     "no-unused-vars": 0,
-    "no-mixed-operators": [1,
+    "no-mixed-operators": [0,
       {
         "allowSamePrecedence": true
       }
