@@ -18,7 +18,7 @@ interface PinProps {
   helper?: Circle,
   helperEnabled?: boolean,
   wiredTo: Wired,
-  valueUpdate: BehaviorSubject<boolean>,
+  valueUpdate: BehaviorSubject<Signal>,
   observable: Observable<boolean>,
   type: PIN_TYPES_ENUM,
   index: number,
@@ -29,7 +29,7 @@ export class Pin implements PinProps {
   public value: Signal;
   public invert: boolean;
   public wiredTo: Wired;
-  public valueUpdate = new BehaviorSubject(false);
+  public valueUpdate: BehaviorSubject<Signal>;
   public observable: Observable<boolean>;
   public type: PIN_TYPES_ENUM;
   public index: number;
@@ -51,5 +51,6 @@ export class Pin implements PinProps {
     this.wiredTo = wiredTo;
     this.type = type;
     this.index = index;
+    this.valueUpdate = new BehaviorSubject<Signal>(value);
   }
 }

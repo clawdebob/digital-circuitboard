@@ -6,7 +6,7 @@ import {DcbElement} from '../elements/dcbElement';
 import React from 'react';
 import * as _ from 'lodash';
 import {filter} from 'rxjs/operators';
-import {Pin, PIN_TYPES_ENUM} from '../elements/Pin/pin';
+import {Pin} from '../elements/Pin/pin';
 import store from '../store/store';
 import {setBoardState} from '../store/actions/boardActions';
 import {Wire} from '../elements/Wire/wire';
@@ -17,6 +17,7 @@ export class BoardInteractor {
   private static ghost: Element | null;
   private static currentElement: DcbElement | null;
   private static elementsList: Array<DcbElement> = [];
+  private static wiresList: Array<Wire> = [];
   private static idCounter = 0;
   private static boardState: BoardState;
   private static wiresToBuildCoords: {
@@ -46,13 +47,11 @@ export class BoardInteractor {
   private static wireData: {
     start: {
       element: DcbElement,
-      pinIndex: number,
-      pinType: PIN_TYPES_ENUM
+      pin: Pin
     } | null,
     end: {
       element: DcbElement,
-      pinIndex: number,
-      pinType: PIN_TYPES_ENUM
+      pin: Pin
     } | null,
   } = {
     start: null,
@@ -137,8 +136,7 @@ export class BoardInteractor {
         .subscribe(() => {
           this.wireData.start = {
             element,
-            pinIndex: pin.index,
-            pinType: pin.type
+            pin
           };
 
           store.dispatch(setBoardState(BOARD_STATES_ENUM.WIRE));
@@ -151,8 +149,7 @@ export class BoardInteractor {
         .subscribe(() => {
           this.wireData.end = {
             element,
-            pinIndex: pin.index,
-            pinType: pin.type
+            pin
           };
         });
 
@@ -184,19 +181,21 @@ export class BoardInteractor {
     this.coords.y1 = y;
   }
 
-  private static wireOrientationCorrection(x1: number, y1: number, x2: number, y2: number) {
-    if(x1 === x2) {
+  private static correctWireOrientation(x1: number, y1: number, x2: number, y2: number) {
+    if (x1 === x2) {
       x1++;
       x2++;
-      if(y1 < y2) {
+
+      if (y1 < y2) {
         y2 += 2;
       } else {
         y1 += 2;
       }
-    } else if(y1 === y2) {
+    } else if (y1 === y2) {
       y1++;
       y2++;
-      if(x1 < x2) {
+
+      if (x1 < x2) {
         x2 += 2;
       } else {
         x1 += 2;
@@ -214,12 +213,6 @@ export class BoardInteractor {
 
     this.coords.x2 = x;
     this.coords.y2 = y;
-
-    const main = new Wire();
-    const bend = new Wire();
-
-    main.className = 'main';
-    bend.className = 'bend';
 
     const {x1, y1, x2, y2} = this.coords;
     const plot = this.wiresToBuildModels.main ? this.wiresToBuildModels.main.plot() : null;
@@ -243,8 +236,8 @@ export class BoardInteractor {
         [x1m, y1m, x2m, y2m] = [x1, y1, x2, y1];
         [x1b, y1b, x2b, y2b] = [x2, y1, x2, y2];
       }
-      [x1m, y1m, x2m, y2m] = this.wireOrientationCorrection(x1m, y1m, x2m, y2m);
-      [x1b, y1b, x2b, y2b] = this.wireOrientationCorrection(x1b, y1b, x2b, y2b);
+      [x1m, y1m, x2m, y2m] = this.correctWireOrientation(x1m, y1m, x2m, y2m);
+      [x1b, y1b, x2b, y2b] = this.correctWireOrientation(x1b, y1b, x2b, y2b);
 
       this.wiresToBuildModels = {
         main: Renderer.createWireGhost(x1m, y1m, x2m, y2m),
@@ -266,7 +259,7 @@ export class BoardInteractor {
         }
       };
     } else {
-      const [x1m, y1m, x2m, y2m] = this.wireOrientationCorrection(x1,y1,x2,y2);
+      const [x1m, y1m, x2m, y2m] = this.correctWireOrientation(x1,y1,x2,y2);
 
       this.wiresToBuildModels = {
         main: Renderer.createWireGhost(x1m, y1m, x2m, y2m),
@@ -275,13 +268,65 @@ export class BoardInteractor {
 
       this.wiresToBuildCoords = {
         main: {
-          x1: x1,
-          y1: y1,
-          x2: x2,
-          y2: y2,
+          x1: x1m,
+          y1: y1m,
+          x2: x2m,
+          y2: y2m
         },
         bend: null,
       };
+    }
+  }
+
+  private static drawWire(e: React.MouseEvent): void {
+    e.preventDefault();
+
+    if (this.wiresToBuildCoords.main) {
+      const main = new Wire();
+      const {x1, y1, x2, y2} = this.wiresToBuildCoords.main;
+
+      main.modelData.model = Renderer.createWire(x1, y1, x2, y2);
+      main.id = `${main.name} ${this.idCounter}`;
+      main.initialize();
+
+      if (this.wireData.start) {
+        const {element, pin} = this.wireData.start;
+
+        main.wireTo(element, pin);
+      }
+
+      if (this.wireData.end && !this.wiresToBuildCoords.bend) {
+        const {element, pin} = this.wireData.end;
+
+        main.wireTo(element, pin);
+      }
+
+      this.wiresList.push(main);
+      this.idCounter++;
+    }
+
+    if (this.wiresToBuildCoords.bend) {
+      const bend = new Wire();
+      const main = _.last(this.wiresList);
+      const {x1, y1, x2, y2} = this.wiresToBuildCoords.bend;
+
+      bend.modelData.model = Renderer.createWire(x1, y1, x2, y2);
+      bend.id = `${bend.name} ${this.idCounter}`;
+      bend.initialize();
+
+      if (main) {
+        main.wireTo(bend);
+        bend.wireTo(main);
+      }
+
+      if (this.wireData.end) {
+        const {element, pin} = this.wireData.end;
+
+        bend.wireTo(element, pin);
+      }
+
+      this.wiresList.push(bend);
+      this.idCounter++;
     }
   }
 
@@ -302,6 +347,7 @@ export class BoardInteractor {
 
     this.applyHelperEvents(element);
     this.elementsList.push(element);
+    element.initialize();
   }
 
   private static applySubscriptions(...args: Array<Subscription>): void {
@@ -330,6 +376,16 @@ export class BoardInteractor {
         this.applySubscriptions(
           fromEvent<React.MouseEvent>(this.svg, 'mouseup')
             .subscribe(e => {
+              this.drawWire(e);
+
+              if (this.wiresToBuildModels.main) {
+                this.wiresToBuildModels.main.remove();
+              }
+
+              if (this.wiresToBuildModels.bend) {
+                this.wiresToBuildModels.bend.remove();
+              }
+
               this.wireData = {
                 start: null,
                 end: null

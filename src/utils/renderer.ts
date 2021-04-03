@@ -73,14 +73,18 @@ class Renderer {
       .stroke('#14ff53');
   }
 
-  public static createWireGhost(x1: number, y1: number, x2: number, y2: number): Line {
+  public static createWire(x1: number, y1: number, x2: number, y2: number): Line {
     return this.svg.line([x1, y1, x2, y2])
-      .opacity(0.5)
       .stroke({
         color: '#000000',
         width: 2
       })
       .addTo(this.middleGround);
+  }
+
+  public static createWireGhost(x1: number, y1: number, x2: number, y2: number): Line {
+    return this.createWire(x1, y1, x2, y2)
+      .opacity(0.5);
   }
 
   public static createElement(element: DcbElement, x: number, y: number): void {
@@ -143,6 +147,10 @@ class Renderer {
       });
     }
 
+    if (element.isInteractive) {
+      group.addClass('interactive-element');
+    }
+
     if (element.signature) {
       const text = this.background.text(element.signature);
 
@@ -154,13 +162,13 @@ class Renderer {
         .x(x + element.dimensions.width / 2 - width / 2)
         .y(y);
 
+      element.modelData.signatureModel = text;
+
       group.add(text);
     }
 
 
-    element.modelData = {
-      model: group,
-    };
+    element.modelData.model = group;
 
     this.background.add(group);
   }

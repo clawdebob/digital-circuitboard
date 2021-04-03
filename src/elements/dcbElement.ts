@@ -1,9 +1,10 @@
-import {G, Text} from '@svgdotjs/svg.js';
+import {G, Element, Text} from '@svgdotjs/svg.js';
 import {DIRECTION, ElementDirection, ElementOrientation, ORIENTATION} from '../types/consts/orientation.const';
 import {ElementProperties, ElementProperty} from '../types/consts/elementDetails.consts';
 import * as _ from 'lodash';
-import {Pin, PIN_TYPES_ENUM} from './Pin/pin';
+import {Pin, PIN_TYPES_ENUM, Signal} from './Pin/pin';
 import {DcbElementName} from '../types/consts/element.consts';
+import {Subscription} from 'rxjs';
 
 const PIN_LENGTH = 12;
 const DEFAULT_DIMENSIONS = {
@@ -30,7 +31,7 @@ export interface PositionData {
 }
 
 interface ModelData {
-  model: G | null;
+  model: G | Element | null;
   signatureModel?: Text;
   interactionModel?: G;
 }
@@ -48,6 +49,9 @@ export interface ElementParams {
   editableProps: Array<ElementProperty>;
   positionData: PositionData;
   maxContacts: number;
+  operation: () => void;
+  updateState: (signal?: Signal) => void;
+  subscriptions: Subscription;
   inPins: Array<Pin>;
   outPins: Array<Pin>;
 }
@@ -68,6 +72,7 @@ export abstract class DcbElement implements ElementParams {
   public inPins: Array<Pin>;
   public outPins: Array<Pin>;
   public signature?: string;
+  public subscriptions = new Subscription();
 
   protected constructor(
     name: DcbElementName,
@@ -192,5 +197,77 @@ export abstract class DcbElement implements ElementParams {
       _.get(this.outPins, `[${idx}].invert`, false),
       _.get(this.outPins, `[${idx}].wiredTo`, null),
     ));
+  }
+
+  public operation(): void {
+    // each element has unique implementation
+  }
+
+  public checkErrors(): void {
+    if (
+      _.countBy(this.inPins, 'value')['undefined'] === this.inPins.length
+      || _.countBy(this.inPins, 'value')['null']
+    ) {
+      _.map(this.outPins, pin => _.set(pin, 'value', null));
+    }
+  }
+
+  public initialize(): void {
+    _.forEach(this.inPins, pin => {
+      const pinSub = pin.valueUpdate.subscribe(() => this.updateState());
+
+      this.subscriptions.add(pinSub);
+    });
+
+    this.updateState();
+  }
+
+  public updateState(): void {
+    if (this.inPins.length) {
+      _.forEach(this.inPins, pin => {
+        if (pin.model) {
+          pin.model.stroke(this.getStateColor(pin.value));
+        }
+      });
+    }
+
+    this.operation();
+    this.checkErrors();
+
+    if (this.outPins.length) {
+      _.forEach(this.outPins, pin => {
+        if (pin.model) {
+          pin.model.stroke(this.getStateColor(pin.value));
+        }
+        pin.valueUpdate.next(pin.value);
+      });
+    }
+  }
+
+  public getStateSignature(signal: Signal): string {
+    switch (signal) {
+      case false:
+        return '0';
+      case true:
+        return '1';
+      default:
+        return 'x';
+    }
+  }
+
+  public getStateColor(signal: Signal): string {
+    switch (signal) {
+      case false:
+        return '#006200';
+      case true:
+        return '#00FF00';
+      // case 'overload':
+      //   stroke = '#ff7700';
+      //   break;
+      case undefined:
+        return '#0077ff';
+      default:
+        return '#FF0000';
+    }
   }
 }

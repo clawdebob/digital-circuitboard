@@ -18,14 +18,13 @@ class And extends DcbElement {
       inContacts: 3,
       fill: '#ffffff',
       outContacts: 1,
-      labelText: 'cool',
     }
   ) {
     super(
       ELEMENT.AND,
       dimensions,
       props,
-      ['inContacts', 'fill', 'labelText']
+      ['inContacts', 'fill']
     );
   }
 
