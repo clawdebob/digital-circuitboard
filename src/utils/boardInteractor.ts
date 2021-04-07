@@ -293,7 +293,7 @@ export class BoardInteractor {
       let x1m, y1m, x2m, y2m;
       let x1b, y1b, x2b, y2b;
 
-      if (plot && plot[0][0] === plot[0][1]) {
+      if (plot && plot[0][0] === plot[1][0]) {
         [x1m, y1m, x2m, y2m] = [x1, y1, x1, y2];
         [x1b, y1b, x2b, y2b] = [x1, y2, x2, y2];
       } else {

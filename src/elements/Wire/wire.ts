@@ -92,8 +92,6 @@ export class Wire extends DcbElement {
             skipWhile(value => value === undefined)
           )
           .subscribe(value => {
-            console.log(value, element.id);
-
             this.updateState(value);
           });
 
