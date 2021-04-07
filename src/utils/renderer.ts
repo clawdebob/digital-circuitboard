@@ -2,6 +2,7 @@ import {Svg, G, Element, SVG, Rect, Circle, Line} from '@svgdotjs/svg.js';
 import tile from '../assets/tile5px.png';
 import * as _ from 'lodash';
 import {DcbElement} from '../elements/dcbElement';
+import {Wire} from '../elements/Wire/wire';
 
 class Renderer {
   private static boardContainer: HTMLElement;
@@ -73,7 +74,7 @@ class Renderer {
       .stroke('#14ff53');
   }
 
-  public static createWire(x1: number, y1: number, x2: number, y2: number): Line {
+  public static createWireModel(x1: number, y1: number, x2: number, y2: number): Line {
     return this.svg.line([x1, y1, x2, y2])
       .stroke({
         color: '#000000',
@@ -82,8 +83,25 @@ class Renderer {
       .addTo(this.middleGround);
   }
 
+  public static createWire(x1: number, y1: number, x2: number, y2: number): Wire {
+    const wire = new Wire();
+
+    wire.modelData.model = this.createWireModel(x1, y1, x2, y2);
+    wire.helpers = [
+      this.createHelper(x1, y1),
+      this.createHelper(x2, y2)
+    ];
+
+    this.background.add(wire.modelData.model);
+
+    this.foreground.add(wire.helpers[0]);
+    this.foreground.add(wire.helpers[1]);
+
+    return wire;
+  }
+
   public static createWireGhost(x1: number, y1: number, x2: number, y2: number): Line {
-    return this.createWire(x1, y1, x2, y2)
+    return this.createWireModel(x1, y1, x2, y2)
       .opacity(0.5);
   }
 

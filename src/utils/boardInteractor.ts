@@ -47,11 +47,11 @@ export class BoardInteractor {
   private static wireData: {
     start: {
       element: DcbElement,
-      pin: Pin
+      pin?: Pin
     } | null,
     end: {
       element: DcbElement,
-      pin: Pin
+      pin?: Pin
     } | null,
   } = {
     start: null,
@@ -66,6 +66,9 @@ export class BoardInteractor {
 
   public static init(boardWrapper: HTMLElement): void {
     Renderer.init(boardWrapper);
+
+    _.set(window, 'elements', this.elementsList);
+    _.set(window, 'wires', this.wiresList);
 
     this.svg = Renderer.svg.node;
   }
@@ -119,6 +122,59 @@ export class BoardInteractor {
     this.ghost = Renderer.makeElementBase(this.currentElement, x, y, true);
   }
 
+  private static applyWireHelpers(wire: Wire): void {
+    const helpers = wire.helpers;
+
+    _.forEach(helpers, helper => {
+      const node = helper.node;
+
+      const mouseDown$ = fromEvent<React.MouseEvent>(node, 'mousedown')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT)
+        ).subscribe(() => {
+          this.wireData.start = {
+            element: wire
+          };
+
+          store.dispatch(setBoardState(BOARD_STATES_ENUM.WIRE));
+        });
+
+      wire.subscriptions.add(mouseDown$);
+
+      const mouseUp$ = fromEvent<React.MouseEvent>(helper.node, 'mouseup')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.WIRE)
+        )
+        .subscribe(() => {
+          this.wireData.end = {
+            element: wire
+          };
+        });
+
+      wire.subscriptions.add(mouseUp$);
+
+      const mouseMove$ = fromEvent<React.MouseEvent>(helper.node, 'mousemove')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
+        )
+        .subscribe(() => {
+          helper.opacity(1);
+        });
+
+      wire.subscriptions.add(mouseMove$);
+
+      const mouseOut$ = fromEvent<React.MouseEvent>(helper.node, 'mouseout')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
+        )
+        .subscribe(() => {
+          helper.opacity(0);
+        });
+
+      wire.subscriptions.add(mouseOut$);
+    });
+  }
+
   private static applyHelperEvents(element: DcbElement): void {
     const pins = _.union(element.inPins, element.outPins);
 
@@ -129,7 +185,7 @@ export class BoardInteractor {
         return;
       }
 
-      fromEvent<React.MouseEvent>(helper.node, 'mousedown')
+      const mouseDown$ = fromEvent<React.MouseEvent>(helper.node, 'mousedown')
         .pipe(
           filter(() => this.boardState === BOARD_STATES_ENUM.EDIT)
         )
@@ -142,7 +198,9 @@ export class BoardInteractor {
           store.dispatch(setBoardState(BOARD_STATES_ENUM.WIRE));
         });
 
-      fromEvent<React.MouseEvent>(helper.node, 'mouseup')
+      element.subscriptions.add(mouseDown$);
+
+      const mouseUp$ = fromEvent<React.MouseEvent>(helper.node, 'mouseup')
         .pipe(
           filter(() => this.boardState === BOARD_STATES_ENUM.WIRE)
         )
@@ -153,7 +211,9 @@ export class BoardInteractor {
           };
         });
 
-      fromEvent<React.MouseEvent>(helper.node, 'mousemove')
+      element.subscriptions.add(mouseUp$);
+
+      const mouseMove$ = fromEvent<React.MouseEvent>(helper.node, 'mousemove')
         .pipe(
           filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
         )
@@ -161,13 +221,17 @@ export class BoardInteractor {
           helper.opacity(1);
         });
 
-      fromEvent<React.MouseEvent>(helper.node, 'mouseout')
+      element.subscriptions.add(mouseMove$);
+
+      const mouseOut$ = fromEvent<React.MouseEvent>(helper.node, 'mouseout')
         .pipe(
           filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
         )
         .subscribe(() => {
           helper.opacity(0);
         });
+
+      element.subscriptions.add(mouseOut$);
     });
   }
 
@@ -282,11 +346,11 @@ export class BoardInteractor {
     e.preventDefault();
 
     if (this.wiresToBuildCoords.main) {
-      const main = new Wire();
       const {x1, y1, x2, y2} = this.wiresToBuildCoords.main;
+      const main = Renderer.createWire(x1, y1, x2, y2);
 
-      main.modelData.model = Renderer.createWire(x1, y1, x2, y2);
       main.id = `${main.name} ${this.idCounter}`;
+      this.applyWireHelpers(main);
       main.initialize();
 
       if (this.wireData.start) {
@@ -306,17 +370,16 @@ export class BoardInteractor {
     }
 
     if (this.wiresToBuildCoords.bend) {
-      const bend = new Wire();
       const main = _.last(this.wiresList);
       const {x1, y1, x2, y2} = this.wiresToBuildCoords.bend;
+      const bend = Renderer.createWire(x1, y1, x2, y2);
 
-      bend.modelData.model = Renderer.createWire(x1, y1, x2, y2);
       bend.id = `${bend.name} ${this.idCounter}`;
+      this.applyWireHelpers(bend);
       bend.initialize();
 
       if (main) {
         main.wireTo(bend);
-        bend.wireTo(main);
       }
 
       if (this.wireData.end) {

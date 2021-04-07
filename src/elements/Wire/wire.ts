@@ -3,7 +3,8 @@ import {DcbElement} from '../dcbElement';
 import {Pin, PIN_TYPES_ENUM, Signal} from '../Pin/pin';
 import {BehaviorSubject} from 'rxjs';
 import * as _ from 'lodash';
-import {distinctUntilChanged, filter, skipWhile} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map, skipWhile} from 'rxjs/operators';
+import {Circle} from '@svgdotjs/svg.js';
 
 export interface WiredElement {
   element: DcbElement;
@@ -26,6 +27,7 @@ export interface WiredElement {
 
 export class Wire extends DcbElement {
   private wiredTo: Array<WiredElement> = [];
+  public helpers: Array<Circle> = [];
   public value: Signal = undefined;
   public valueUpdate: BehaviorSubject<Signal> = new BehaviorSubject<Signal>(undefined);
   public name = ELEMENT.WIRE;
@@ -55,7 +57,7 @@ export class Wire extends DcbElement {
           const sub = pin.valueUpdate
             .pipe(
               distinctUntilChanged(),
-              // filter(value => value !== this.value)
+              filter(value => value !== this.value)
             )
             .subscribe(signal => this.updateState(signal));
 
@@ -80,20 +82,14 @@ export class Wire extends DcbElement {
           element
         });
 
-        const wireSubscription = this.valueUpdate
-          .pipe(
-            distinctUntilChanged(),
-            filter(value => value !== element.value)
-          )
-          .subscribe(value => element.updateState(value));
-
-        element.subscriptions.add(wireSubscription);
+        element.wireTo(this);
 
         const sub = element.valueUpdate
           .pipe(
+            map(() => element.value),
             distinctUntilChanged(),
             filter(value => value !== this.value),
-            // skipWhile(value => value === undefined)
+            skipWhile(value => value === undefined)
           )
           .subscribe(value => {
             console.log(value, element.id);
@@ -107,33 +103,35 @@ export class Wire extends DcbElement {
   }
 
   public updateState(signal?: Signal): void {
+    this.value = signal;
+
     if (
       _.every(this.wiredTo, element => element.pin && element.pin.type === PIN_TYPES_ENUM.OUT)
       && this.wiredTo.length === 2
     ) {
       if (_.some(this.wiredTo, element => element.pin && element.pin.value !== signal)) {
         this.value = null;
-      } else {
-        this.value = signal;
       }
     } else if (_.some(this.wiredTo, element => element.pin && element.pin.type === PIN_TYPES_ENUM.OUT)) {
-      const wired = _.find(this.wiredTo, element => element.pin && element.pin.type === PIN_TYPES_ENUM.OUT);
+      const wired = _.find(this.wiredTo, element => element.pin && element.pin.type === PIN_TYPES_ENUM.OUT) as undefined | WiredElement;
       const pinValue = _.get(wired, 'pin.value');
 
       if (wired && signal !== pinValue) {
-        this.value = null;
-      } else {
-        this.value = signal;
+        if (signal !== undefined) {
+          this.value = null;
+        }
       }
-    } else {
-      this.value = signal;
     }
 
     if (this.modelData.model) {
       this.modelData.model.stroke(this.getStateColor(this.value));
     }
 
-    console.log(signal, this.id, this.value);
+    _.forEach(this.wiredTo, element => {
+      if (element.pin && element.pin.model) {
+        element.pin.model.stroke(this.getStateColor(this.value));
+      }
+    });
 
     this.valueUpdate.next(this.value);
   }
