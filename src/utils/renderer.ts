@@ -185,8 +185,12 @@ class Renderer {
       group.add(text);
     }
 
-
     element.modelData.model = group;
+    element.dimensions = {
+      ...element.dimensions,
+      x,
+      y
+    };
 
     this.background.add(group);
   }

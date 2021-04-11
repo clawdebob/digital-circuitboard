@@ -57,7 +57,6 @@ const SideMenu = (): React.ReactElement => {
     } else {
       slider.column.style.width = `${slider.width}px`;
     }
-    console.log('mousemove');
   };
 
   useEffect(() => {

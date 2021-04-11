@@ -342,54 +342,107 @@ export class BoardInteractor {
     }
   }
 
+  private static prolongWire(wireToProlong: Wire, x1: number, y1: number, x2: number, y2: number): Wire | null {
+    const [{x: x1w, y: y1w}, {x: x2w, y: y2w}] = wireToProlong.positionData.coords;
+    const prolong = (x1: number, y1: number, x2: number, y2: number) => {
+      if (!(wireToProlong.modelData.model instanceof Line)) {
+        return;
+      }
+
+      wireToProlong.modelData.model.plot(x1, y1, x2, y2);
+      wireToProlong.helpers[0].x(x1 - 5).y(y1 - 5);
+      wireToProlong.helpers[1].x(x2 - 5).y(y2 - 5);
+    };
+
+    if (!(wireToProlong.modelData.model instanceof Line)) {
+      return null;
+    }
+
+    if (x1w === x1) {
+      const minY = Math.min(y1, y2, y1w, y2w);
+      const maxY = Math.max(y1, y2, y1w, y2w);
+
+      if (y1w > y2w) {
+        prolong(x1, maxY, x2, minY);
+      } else {
+        prolong(x1, minY, x2, maxY);
+      }
+
+      return wireToProlong;
+    } else if (y1w === y1) {
+      const minX = Math.min(x1, x2, x1w, x2w);
+      const maxX = Math.max(x1, x2, x1w, x2w);
+
+      if (x1w > x2w) {
+        prolong(maxX, y1, minX, y2);
+      } else {
+        prolong(minX, y1, maxX, y2);
+      }
+
+      return wireToProlong;
+    }
+
+    return null;
+  }
+
   private static drawWire(e: React.MouseEvent): void {
     e.preventDefault();
 
     if (this.wiresToBuildCoords.main) {
       const {x1, y1, x2, y2} = this.wiresToBuildCoords.main;
-      const main = Renderer.createWire(x1, y1, x2, y2);
+      let main;
 
-      main.id = `${main.name} ${this.idCounter}`;
-      this.applyWireHelpers(main);
-      main.initialize();
+      if (this.wireData.start && this.wireData.start.element instanceof Wire) {
+        const {element} = this.wireData.start;
+        const newWire = this.prolongWire(element, x1, y1, x2, y2);
 
-      if (this.wireData.start) {
-        const {element, pin} = this.wireData.start;
+        if (newWire) {
+          main = newWire;
+        }
+      } else {
+        main = Renderer.createWire(x1, y1, x2, y2);
 
-        main.wireTo(element, pin);
+        main.id = `${main.name} ${this.idCounter}`;
+        this.applyWireHelpers(main);
+        main.initialize();
+
+        if (this.wireData.start) {
+          const {element, pin} = this.wireData.start;
+
+          main.wireTo(element, pin);
+        }
+
+        if (this.wireData.end && !this.wiresToBuildCoords.bend) {
+          const {element, pin} = this.wireData.end;
+
+          main.wireTo(element, pin);
+        }
+
+        this.wiresList.push(main);
+        this.idCounter++;
       }
 
-      if (this.wireData.end && !this.wiresToBuildCoords.bend) {
-        const {element, pin} = this.wireData.end;
+      if (this.wiresToBuildCoords.bend) {
+        const {x1, y1, x2, y2} = this.wiresToBuildCoords.bend;
+        const bend = Renderer.createWire(x1, y1, x2, y2);
 
-        main.wireTo(element, pin);
+        bend.id = `${bend.name} ${this.idCounter}`;
+        this.applyWireHelpers(bend);
+        bend.initialize();
+
+        if (main) {
+          main.wireTo(bend);
+        }
+
+        if (this.wireData.end) {
+          const {element, pin} = this.wireData.end;
+
+          bend.wireTo(element, pin);
+        }
+
+        this.wiresList.push(bend);
+        this.idCounter++;
       }
-
-      this.wiresList.push(main);
-      this.idCounter++;
-    }
-
-    if (this.wiresToBuildCoords.bend) {
-      const main = _.last(this.wiresList);
-      const {x1, y1, x2, y2} = this.wiresToBuildCoords.bend;
-      const bend = Renderer.createWire(x1, y1, x2, y2);
-
-      bend.id = `${bend.name} ${this.idCounter}`;
-      this.applyWireHelpers(bend);
-      bend.initialize();
-
-      if (main) {
-        main.wireTo(bend);
-      }
-
-      if (this.wireData.end) {
-        const {element, pin} = this.wireData.end;
-
-        bend.wireTo(element, pin);
-      }
-
-      this.wiresList.push(bend);
-      this.idCounter++;
     }
   }
 

@@ -32,8 +32,6 @@ const ElementGroupElements = (props: ElementGroupElementsProps): React.ReactElem
     </div>
   ));
 
-  console.log(props.elements);
-
   return (
     <div className={props.className}>
       {elementsList}

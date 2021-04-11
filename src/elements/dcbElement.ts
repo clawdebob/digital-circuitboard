@@ -101,7 +101,7 @@ export abstract class DcbElement implements ElementParams {
     return {
       coords: [{x: this.dimensions.x, y: this.dimensions.y}],
       orientation: ORIENTATION.HORIZONTAL,
-      direction: DIRECTION.T2B,
+      direction: DIRECTION.L2R,
     };
   }
 

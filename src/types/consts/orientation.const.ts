@@ -4,10 +4,10 @@ export enum ORIENTATION {
 }
 
 export enum DIRECTION {
-  T2B = 'T2B',
-  B2T = 'B2T',
-  L2R = 'L2R',
-  R2L = 'R2L'
+  T2B = 'T2B', // top to bottom
+  B2T = 'B2T', // bottom to top
+  L2R = 'L2R', // left to right
+  R2L = 'R2L' // right to left
 }
 
 export type ElementOrientation = ORIENTATION.HORIZONTAL

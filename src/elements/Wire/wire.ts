@@ -1,10 +1,11 @@
 import {ELEMENT} from '../../types/consts/element.consts';
-import {DcbElement} from '../dcbElement';
+import {DcbElement, PositionData} from '../dcbElement';
 import {Pin, PIN_TYPES_ENUM, Signal} from '../Pin/pin';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import * as _ from 'lodash';
 import {distinctUntilChanged, filter, map, skipWhile} from 'rxjs/operators';
-import {Circle} from '@svgdotjs/svg.js';
+import {Circle, Line} from '@svgdotjs/svg.js';
+import {DIRECTION, ORIENTATION} from '../../types/consts/orientation.const';
 
 export interface WiredElement {
   element: DcbElement;
@@ -117,6 +118,8 @@ export class Wire extends DcbElement {
       if (wired && signal !== pinValue) {
         if (signal !== undefined) {
           this.value = null;
+        } else {
+          this.value = pinValue;
         }
       }
     }
@@ -132,5 +135,62 @@ export class Wire extends DcbElement {
     });
 
     this.valueUpdate.next(this.value);
+  }
+
+  public delete(): void {
+    if (this.modelData.model) {
+      this.modelData.model.remove();
+    }
+
+    _.forEach(this.helpers, helper => helper.remove());
+    this.updateState(undefined);
+    _.forEach(this.wiredTo, item => {
+      if (item.element instanceof Wire) {
+        item.element.removeWiredElement(this);
+      }
+    });
+
+    this.wiredTo = [];
+    this.subscriptions.unsubscribe();
+  }
+
+  public get positionData(): PositionData {
+    const model = this.modelData.model;
+
+    if (model instanceof Line) {
+      const [x1, y1] = model.plot()[0];
+      const [x2, y2] = model.plot()[1];
+      const coords = [{x: x1, y: y1}, {x: x2, y: y2}];
+      const orientation = x1 === x2 ? ORIENTATION.VERTICAL : ORIENTATION.HORIZONTAL;
+      let direction;
+
+      if (orientation === ORIENTATION.HORIZONTAL) {
+        direction = y1 < y2 ? DIRECTION.T2B : DIRECTION.B2T;
+      } else {
+        direction = x1 < x2 ? DIRECTION.L2R : DIRECTION.R2L;
+      }
+
+      return {
+        coords,
+        orientation,
+        direction
+      };
+    }
+
+    return {
+      coords: [{x: this.dimensions.x, y: this.dimensions.y}],
+      orientation: ORIENTATION.HORIZONTAL,
+      direction: DIRECTION.L2R,
+    };
+  }
+
+  public removeWiredElement(element: DcbElement): void {
+    const currentWiredTo = _.filter(this.wiredTo, item => item.element.id !== element.id);
+
+    this.subscriptions.unsubscribe();
+    this.subscriptions = new Subscription();
+    this.wiredTo = [];
+
+    _.forEach(currentWiredTo, item => this.wireTo(item.element, item.pin));
   }
 }
