@@ -10,6 +10,7 @@ import {Pin} from '../elements/Pin/pin';
 import store from '../store/store';
 import {setBoardState} from '../store/actions/boardActions';
 import {Wire} from '../elements/Wire/wire';
+import {ORIENTATION} from '../types/consts/orientation.const';
 
 export class BoardInteractor {
   private static eventSubscription = new Subscription();
@@ -358,7 +359,7 @@ export class BoardInteractor {
       return null;
     }
 
-    if (x1w === x1) {
+    if (x1w === x2) {
       const minY = Math.min(y1, y2, y1w, y2w);
       const maxY = Math.max(y1, y2, y1w, y2w);
 
@@ -369,7 +370,7 @@ export class BoardInteractor {
       }
 
       return wireToProlong;
-    } else if (y1w === y1) {
+    } else if (y1w === y2) {
       const minX = Math.min(x1, x2, x1w, x2w);
       const maxX = Math.max(x1, x2, x1w, x2w);
 
@@ -390,9 +391,14 @@ export class BoardInteractor {
 
     if (this.wiresToBuildCoords.main) {
       const {x1, y1, x2, y2} = this.wiresToBuildCoords.main;
+      const mainOrientation = x1 === x2 ? ORIENTATION.VERTICAL : ORIENTATION.HORIZONTAL;
       let main;
 
-      if (this.wireData.start && this.wireData.start.element instanceof Wire) {
+      if (
+        this.wireData.start
+        && this.wireData.start.element instanceof Wire
+        && mainOrientation === this.wireData.start.element.positionData.orientation
+      ) {
         const {element} = this.wireData.start;
         const newWire = this.prolongWire(element, x1, y1, x2, y2);
 
