@@ -74,6 +74,15 @@ class Renderer {
       .stroke('#14ff53');
   }
 
+  private static createInvertCircle(x: number, y: number): Circle {
+    const diameter = 7;
+
+    return this.createCircle(x  - diameter / 2, y - diameter / 2, diameter)
+      .addClass('invert-circle')
+      .fill('#ffffff')
+      .stroke('#000000');
+  }
+
   public static createWireModel(x1: number, y1: number, x2: number, y2: number): Line {
     return this.svg.line([x1, y1, x2, y2])
       .stroke({
@@ -130,6 +139,10 @@ class Renderer {
         group.add(line);
         this.foreground.add(helper);
 
+        if (pin.invert) {
+          group.add(this.createInvertCircle(endCoords.x + x, endCoords.y + y));
+        }
+
         return {
           ...pin,
           model: line,
@@ -156,6 +169,10 @@ class Renderer {
         });
         group.add(line);
         this.foreground.add(helper);
+
+        if (pin.invert) {
+          group.add(this.createInvertCircle(startCoords.x + x, startCoords.y + y));
+        }
 
         return {
           ...pin,

@@ -39,6 +39,7 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
     const {dimensions, props} = currentElement;
     const newElement = createElement(dimensions, props);
 
+    newElement.inPins = currentElement.inPins;
     newElement.inPins[pinIdx].invert = value === 'true';
 
     dispatch(setCurrentElement(newElement));

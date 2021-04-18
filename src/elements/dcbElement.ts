@@ -78,7 +78,8 @@ export abstract class DcbElement implements ElementParams {
     name: DcbElementName,
     dimensions: Dimensions = DEFAULT_DIMENSIONS,
     props: ElementProperties = {},
-    editableProps: Array<ElementProperty> = []
+    editableProps: Array<ElementProperty> = [],
+    invertOuterPins = false
   ) {
     this.dimensions = dimensions;
     this.name = name;
@@ -94,7 +95,7 @@ export abstract class DcbElement implements ElementParams {
 
     this.maxContacts = Math.round(availableLen / 10);
     this.inPins = this.getInPins();
-    this.outPins = this.getOutPins();
+    this.outPins = this.getOutPins(invertOuterPins);
   }
 
   public get positionData(): PositionData {
@@ -170,7 +171,7 @@ export abstract class DcbElement implements ElementParams {
     ));
   }
 
-  private getOutPins() {
+  private getOutPins(invertOuterPins = false) {
     const numberOfPins = this.props.outContacts;
 
     if (!numberOfPins) {
@@ -194,7 +195,7 @@ export abstract class DcbElement implements ElementParams {
       PIN_TYPES_ENUM.OUT,
       idx,
       _.get(this.outPins, `[${idx}].value`, undefined),
-      _.get(this.outPins, `[${idx}].invert`, false),
+      _.get(this.outPins, `[${idx}].invert`, invertOuterPins),
       _.get(this.outPins, `[${idx}].wiredTo`, null),
     ));
   }

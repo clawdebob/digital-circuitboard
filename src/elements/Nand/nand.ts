@@ -24,7 +24,8 @@ class Nand extends DcbElement {
       ELEMENT.NAND,
       dimensions,
       props,
-      ['inContacts', 'fill']
+      ['inContacts', 'fill'],
+      true
     );
   }
 
@@ -32,7 +33,7 @@ class Nand extends DcbElement {
   public operation(): void {
     this.outPins[0].value = !_.reduce(
       this.inPins,
-      (acc: boolean, pin) => acc && Boolean(pin.value),
+      (acc: boolean, pin) => acc && Boolean(pin.invert ? !pin.value : pin.value),
       true
     );
   }
