@@ -62,6 +62,8 @@ export class Wire extends DcbElement {
             )
             .subscribe(signal => this.updateState(signal));
 
+          element.toggleOutPinHelper(pin.index, false);
+
           this.subscriptions.add(sub);
         } else {
           const elementSubscription = this.valueUpdate
@@ -73,6 +75,8 @@ export class Wire extends DcbElement {
               pin.value = value;
               pin.valueUpdate.next(value);
             });
+
+          element.toggleInPinHelper(pin.index, false);
 
           element.subscriptions.add(elementSubscription);
         }

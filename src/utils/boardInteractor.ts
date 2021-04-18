@@ -188,7 +188,8 @@ export class BoardInteractor {
 
       const mouseDown$ = fromEvent<React.MouseEvent>(helper.node, 'mousedown')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT)
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT),
+          filter(() => pin.helperEnabled)
         )
         .subscribe(() => {
           this.wireData.start = {
@@ -203,7 +204,8 @@ export class BoardInteractor {
 
       const mouseUp$ = fromEvent<React.MouseEvent>(helper.node, 'mouseup')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.WIRE)
+          filter(() => this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => pin.helperEnabled)
         )
         .subscribe(() => {
           this.wireData.end = {
@@ -216,7 +218,8 @@ export class BoardInteractor {
 
       const mouseMove$ = fromEvent<React.MouseEvent>(helper.node, 'mousemove')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => pin.helperEnabled)
         )
         .subscribe(() => {
           helper.opacity(1);
@@ -226,7 +229,8 @@ export class BoardInteractor {
 
       const mouseOut$ = fromEvent<React.MouseEvent>(helper.node, 'mouseout')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => pin.helperEnabled)
         )
         .subscribe(() => {
           helper.opacity(0);
@@ -393,6 +397,10 @@ export class BoardInteractor {
       const {x1, y1, x2, y2} = this.wiresToBuildCoords.main;
       const mainOrientation = x1 === x2 ? ORIENTATION.VERTICAL : ORIENTATION.HORIZONTAL;
       let main;
+
+      if (Math.abs(Math.pow(x1 - x2, 2) - Math.pow(y1 - y2, 2)) < 12) {
+        return;
+      }
 
       if (
         this.wireData.start

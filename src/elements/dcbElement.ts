@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import {Pin, PIN_TYPES_ENUM, Signal} from './Pin/pin';
 import {DcbElementName} from '../types/consts/element.consts';
 import {Subscription} from 'rxjs';
+import Renderer from '../utils/renderer';
 
 const PIN_LENGTH = 12;
 const DEFAULT_DIMENSIONS = {
@@ -253,6 +254,32 @@ export abstract class DcbElement implements ElementParams {
         return '1';
       default:
         return 'x';
+    }
+  }
+
+  public toggleInPinHelper(idx: number, value = true): void {
+    const model = this.inPins[idx].helper;
+
+    this.inPins[idx].helperEnabled = value;
+
+    if (Renderer.foreground && Renderer.background && model) {
+      const layer = value ? Renderer.foreground : Renderer.background;
+
+      layer.add(model);
+      model.opacity(0);
+    }
+  }
+
+  public toggleOutPinHelper(idx: number, value = true): void {
+    const model = this.outPins[idx].helper;
+
+    this.outPins[idx].helperEnabled = value;
+
+    if (Renderer.foreground && Renderer.background && model) {
+      const layer = value ? Renderer.foreground : Renderer.background;
+
+      layer.add(model);
+      model.opacity(0);
     }
   }
 

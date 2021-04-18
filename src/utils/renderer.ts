@@ -8,9 +8,9 @@ class Renderer {
   private static boardContainer: HTMLElement;
   public static svg: Svg;
   public static board: G;
-  private static background: G;
+  public static background: G;
   private static middleGround: G;
-  private static foreground: G;
+  public static foreground: G;
 
   public static init(element: HTMLElement): void {
     this.boardContainer = element;

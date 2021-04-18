@@ -35,6 +35,7 @@ export class Pin implements PinProps {
   public index: number;
   public model?: Line;
   public helper?: Circle;
+  public helperEnabled = true;
 
   constructor(
     positionData: PositionData,
