@@ -48,11 +48,13 @@ export class BoardInteractor {
   private static wireData: {
     start: {
       element: DcbElement,
-      pin?: Pin
+      pin?: Pin,
+      isJunction?: boolean;
     } | null,
     end: {
       element: DcbElement,
-      pin?: Pin
+      pin?: Pin,
+      isJunction?: boolean;
     } | null,
   } = {
     start: null,
@@ -123,15 +125,75 @@ export class BoardInteractor {
     this.ghost = Renderer.makeElementBase(this.currentElement, x, y, true);
   }
 
+  private static applyJunctionHelpers(wire: Wire): void {
+    const helpers = wire.junctionHelpers;
+
+    _.forEach(helpers, helper => {
+      const node = helper.model.node;
+
+      const mouseDown$ = fromEvent<React.MouseEvent>(node, 'mousedown')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT),
+          filter(() => helper.isEnabled)
+        ).subscribe(() => {
+          this.wireData.start = {
+            element: wire,
+            isJunction: true
+          };
+
+          store.dispatch(setBoardState(BOARD_STATES_ENUM.WIRE));
+        });
+
+      wire.junctionSubscriptions.add(mouseDown$);
+
+      const mouseUp$ = fromEvent<React.MouseEvent>(helper.model.node, 'mouseup')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => helper.isEnabled)
+        )
+        .subscribe(() => {
+          this.wireData.end = {
+            element: wire,
+            isJunction: true
+          };
+        });
+
+      wire.junctionSubscriptions.add(mouseUp$);
+
+      const mouseMove$ = fromEvent<React.MouseEvent>(helper.model.node, 'mousemove')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => helper.isEnabled)
+        )
+        .subscribe(() => {
+          helper.model.opacity(1);
+        });
+
+      wire.junctionSubscriptions.add(mouseMove$);
+
+      const mouseOut$ = fromEvent<React.MouseEvent>(helper.model.node, 'mouseout')
+        .pipe(
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => helper.isEnabled)
+        )
+        .subscribe(() => {
+          helper.model.opacity(0);
+        });
+
+      wire.junctionSubscriptions.add(mouseOut$);
+    });
+  }
+
   private static applyWireHelpers(wire: Wire): void {
     const helpers = wire.helpers;
 
     _.forEach(helpers, helper => {
-      const node = helper.node;
+      const node = helper.model.node;
 
       const mouseDown$ = fromEvent<React.MouseEvent>(node, 'mousedown')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT)
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT),
+          filter(() => helper.isEnabled)
         ).subscribe(() => {
           this.wireData.start = {
             element: wire
@@ -142,9 +204,10 @@ export class BoardInteractor {
 
       wire.subscriptions.add(mouseDown$);
 
-      const mouseUp$ = fromEvent<React.MouseEvent>(helper.node, 'mouseup')
+      const mouseUp$ = fromEvent<React.MouseEvent>(helper.model.node, 'mouseup')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.WIRE)
+          filter(() => this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => helper.isEnabled)
         )
         .subscribe(() => {
           this.wireData.end = {
@@ -154,26 +217,30 @@ export class BoardInteractor {
 
       wire.subscriptions.add(mouseUp$);
 
-      const mouseMove$ = fromEvent<React.MouseEvent>(helper.node, 'mousemove')
+      const mouseMove$ = fromEvent<React.MouseEvent>(helper.model.node, 'mousemove')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => helper.isEnabled)
         )
         .subscribe(() => {
-          helper.opacity(1);
+          helper.model.opacity(1);
         });
 
       wire.subscriptions.add(mouseMove$);
 
-      const mouseOut$ = fromEvent<React.MouseEvent>(helper.node, 'mouseout')
+      const mouseOut$ = fromEvent<React.MouseEvent>(helper.model.node, 'mouseout')
         .pipe(
-          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE)
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT || this.boardState === BOARD_STATES_ENUM.WIRE),
+          filter(() => helper.isEnabled)
         )
         .subscribe(() => {
-          helper.opacity(0);
+          helper.model.opacity(0);
         });
 
       wire.subscriptions.add(mouseOut$);
     });
+
+    this.applyJunctionHelpers(wire);
   }
 
   private static applyHelperEvents(element: DcbElement): void {
@@ -355,8 +422,13 @@ export class BoardInteractor {
       }
 
       wireToProlong.modelData.model.plot(x1, y1, x2, y2);
-      wireToProlong.helpers[0].x(x1 - 5).y(y1 - 5);
-      wireToProlong.helpers[1].x(x2 - 5).y(y2 - 5);
+      wireToProlong.helpers[0].model.x(x1 - 5).y(y1 - 5);
+      wireToProlong.helpers[1].model.x(x2 - 5).y(y2 - 5);
+
+      wireToProlong.resetJunctionHelpers();
+      wireToProlong.junctionHelpers = Renderer.getJunctionHelpers(x1, y1, x2, y2);
+
+      this.applyJunctionHelpers(wireToProlong);
     };
 
     if (!(wireToProlong.modelData.model instanceof Line)) {

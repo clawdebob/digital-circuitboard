@@ -6,10 +6,16 @@ import * as _ from 'lodash';
 import {distinctUntilChanged, filter, map, skipWhile} from 'rxjs/operators';
 import {Circle, Line} from '@svgdotjs/svg.js';
 import {DIRECTION, ORIENTATION} from '../../types/consts/orientation.const';
+import Renderer from '../../utils/renderer';
 
 export interface WiredElement {
   element: DcbElement;
   pin?: Pin;
+}
+
+export interface WireHelper {
+  isEnabled: boolean,
+  model: Circle,
 }
 
 /*
@@ -18,17 +24,13 @@ export interface WiredElement {
 * 3. Использовать тактику пограничного провода, когда провод присоединенный к пину сам определят правильность сигнала на участке цепи (наименее нагруженный вариант)
 *
 *
-*
-*
-*
-*
-*
-*
- */
+*/
 
 export class Wire extends DcbElement {
   private wiredTo: Array<WiredElement> = [];
-  public helpers: Array<Circle> = [];
+  public helpers: Array<WireHelper> = [];
+  public junctionHelpers: Array<WireHelper> = [];
+  public junctionSubscriptions = new Subscription();
   public value: Signal = undefined;
   public valueUpdate: BehaviorSubject<Signal> = new BehaviorSubject<Signal>(undefined);
   public name = ELEMENT.WIRE;
@@ -40,6 +42,16 @@ export class Wire extends DcbElement {
   public initialize() {
     if (this.modelData.model) {
       this.modelData.model.stroke(this.getStateColor(undefined));
+    }
+  }
+
+  private toggleHelper(helper: WireHelper, value = true) {
+    helper.isEnabled = value;
+
+    if (Renderer.background && Renderer.foreground) {
+      const layer = value ? Renderer.foreground : Renderer.background;
+
+      layer.add(helper.model);
     }
   }
 
@@ -83,6 +95,23 @@ export class Wire extends DcbElement {
       }
 
       if (element instanceof Wire) {
+        const helperCoords = _.map(element.helpers, helper => ({
+          x: helper.model.x(),
+          y: helper.model.y()
+        }));
+        const closestHelper = _.minBy(this.helpers, helper => {
+          const [{x: x1, y: y1}, {x: x2, y: y2}] = helperCoords;
+
+          return _.min([
+            Math.abs(Math.pow(x1 - helper.model.x(), 2) - Math.pow(y1 - helper.model.y(), 2)),
+            Math.abs(Math.pow(x2 - helper.model.x(), 2) - Math.pow(y2 - helper.model.y(), 2))
+          ]);
+        });
+
+        if (closestHelper) {
+          this.toggleHelper(closestHelper, false);
+        }
+
         this.wiredTo.push({
           element
         });
@@ -146,7 +175,11 @@ export class Wire extends DcbElement {
       this.modelData.model.remove();
     }
 
-    _.forEach(this.helpers, helper => helper.remove());
+    _.forEach(
+      _.union(this.helpers, this.junctionHelpers),
+      helper => helper.model.remove()
+    );
+
     this.updateState(undefined);
     _.forEach(this.wiredTo, item => {
       if (item.element instanceof Wire) {
@@ -156,6 +189,7 @@ export class Wire extends DcbElement {
 
     this.wiredTo = [];
     this.subscriptions.unsubscribe();
+    this.junctionSubscriptions.unsubscribe();
   }
 
   public get positionData(): PositionData {
@@ -188,9 +222,17 @@ export class Wire extends DcbElement {
     };
   }
 
+  public resetJunctionHelpers(): void {
+    this.junctionSubscriptions.unsubscribe();
+    this.junctionSubscriptions = new Subscription();
+
+    _.forEach(this.junctionHelpers, helper => helper.model.remove());
+  }
+
   public removeWiredElement(element: DcbElement): void {
     const currentWiredTo = _.filter(this.wiredTo, item => item.element.id !== element.id);
 
+    // TO-DO update when delete will be implemented
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
     this.wiredTo = [];

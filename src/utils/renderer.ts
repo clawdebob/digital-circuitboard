@@ -2,7 +2,7 @@ import {Svg, G, Element, SVG, Rect, Circle, Line} from '@svgdotjs/svg.js';
 import tile from '../assets/tile5px.png';
 import * as _ from 'lodash';
 import {DcbElement} from '../elements/dcbElement';
-import {Wire} from '../elements/Wire/wire';
+import {Wire, WireHelper} from '../elements/Wire/wire';
 
 class Renderer {
   private static boardContainer: HTMLElement;
@@ -92,19 +92,54 @@ class Renderer {
       .addTo(this.middleGround);
   }
 
+  public static getJunctionHelpers(x1: number, y1: number, x2: number, y2: number): Array<WireHelper> {
+    const startCoord = x1 === x2 ? y1 : x1;
+    const endCoord = x1 === x2 ? y2 : x2;
+    const helpers = [];
+
+    if (y1 < y2 || x1 < x2) {
+      for (let coord = startCoord + 13; coord < endCoord - 12; coord += 12) {
+        helpers.push({
+          isEnabled: true,
+          model: this.createHelper(
+            x1 === x2 ? x1 : coord,
+            x1 === x2 ? coord : y1
+          )
+        });
+      }
+    } else {
+      for (let coord = startCoord - 13; coord > endCoord + 12; coord -= 12) {
+        helpers.push({
+          isEnabled: true,
+          model: this.createHelper(
+            x1 === x2 ? x1 : coord,
+            x1 === x2 ? coord : y1
+          )
+        });
+      }
+    }
+
+    _.forEach(helpers, data => {
+      this.foreground.add(data.model);
+    });
+
+    return helpers;
+  }
+
   public static createWire(x1: number, y1: number, x2: number, y2: number): Wire {
     const wire = new Wire();
 
     wire.modelData.model = this.createWireModel(x1, y1, x2, y2);
     wire.helpers = [
-      this.createHelper(x1, y1),
-      this.createHelper(x2, y2)
+      {isEnabled: true, model: this.createHelper(x1, y1)},
+      {isEnabled: true, model: this.createHelper(x2, y2)}
     ];
 
-    this.background.add(wire.modelData.model);
+    wire.junctionHelpers = this.getJunctionHelpers(x1, y1, x2, y2);
 
-    this.foreground.add(wire.helpers[0]);
-    this.foreground.add(wire.helpers[1]);
+    _.forEach(wire.helpers, data => {
+      this.foreground.add(data.model);
+    });
 
     return wire;
   }
