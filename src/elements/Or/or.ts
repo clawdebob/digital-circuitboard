@@ -3,8 +3,8 @@ import * as _ from 'lodash';
 import {ELEMENT} from '../../types/consts/element.consts';
 import {ElementProperties} from '../../types/consts/elementDetails.consts';
 
-class Nand extends DcbElement {
-  public signature = '&';
+class Or extends DcbElement {
+  public signature = '1';
 
   public constructor(
     dimensions: Dimensions = {
@@ -21,22 +21,21 @@ class Nand extends DcbElement {
     }
   ) {
     super(
-      ELEMENT.NAND,
+      ELEMENT.OR,
       dimensions,
       props,
       ['inContacts', 'fill'],
-      true
     );
   }
 
 
   public operation(): void {
-    this.outPins[0].value = !_.reduce(
+    this.outPins[0].value = _.reduce(
       this.inPins,
-      (acc: boolean, pin) => acc && Boolean(pin.value),
-      true
+      (acc: boolean, pin) => acc || Boolean(pin.value),
+      false
     );
   }
 }
 
-export default Nand;
+export default Or;

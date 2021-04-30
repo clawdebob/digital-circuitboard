@@ -5,6 +5,8 @@ import Nand from '../elements/Nand/nand';
 import {Dimensions} from '../elements/dcbElement';
 import {ElementProperties} from '../types/consts/elementDetails.consts';
 import Button from '../elements/Button/button';
+import Or from '../elements/Or/or';
+import Nor from '../elements/Nor/nor';
 
 interface BuilderData {
   create: any;
@@ -13,9 +15,9 @@ interface BuilderData {
 
 export default class elementBuilder {
   static elementMap = new Map<DcbElementName, BuilderData>([
-    [ELEMENT.OR, {create: _.noop, icon: require('../assets/or.svg')}],
+    [ELEMENT.OR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Or(dimensions, props), icon: require('../assets/or.svg')}],
     [ELEMENT.AND, {create: (dimensions?: Dimensions, props?: ElementProperties) => new And(dimensions, props), icon: require('../assets/and.svg')}],
-    [ELEMENT.NOR, {create: _.noop, icon: require('../assets/nor.svg')}],
+    [ELEMENT.NOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nor(dimensions, props), icon: require('../assets/nor.svg')}],
     [ELEMENT.NAND, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nand(dimensions, props), icon: require('../assets/nand.svg')}],
     [ELEMENT.XOR, {create: _.noop, icon: require('../assets/xor.svg')}],
     [ELEMENT.NXOR, {create: _.noop, icon: require('../assets/nxor.svg')}],

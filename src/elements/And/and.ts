@@ -32,7 +32,7 @@ class And extends DcbElement {
   public operation(): void {
     this.outPins[0].value = _.reduce(
       this.inPins,
-      (acc: boolean, pin) => acc && Boolean(pin.invert ? !pin.value : pin.value),
+      (acc: boolean, pin) => acc && Boolean(pin.value),
       true
     );
   }

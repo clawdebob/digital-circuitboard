@@ -227,6 +227,10 @@ export abstract class DcbElement implements ElementParams {
   public updateState(): void {
     if (this.inPins.length) {
       _.forEach(this.inPins, pin => {
+        if (pin.invert) {
+          pin.value = !pin.value;
+        }
+
         if (pin.model) {
           pin.model.stroke(this.getStateColor(pin.value));
         }
@@ -241,6 +245,7 @@ export abstract class DcbElement implements ElementParams {
         if (pin.model) {
           pin.model.stroke(this.getStateColor(pin.value));
         }
+
         pin.valueUpdate.next(pin.value);
       });
     }
