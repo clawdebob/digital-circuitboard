@@ -12,6 +12,12 @@ import {setBoardState} from '../store/actions/boardActions';
 import {Wire} from '../elements/Wire/wire';
 import {ORIENTATION} from '../types/consts/orientation.const';
 
+interface WireData {
+  element: DcbElement;
+  pin?: Pin;
+  isJunction?: boolean;
+}
+
 export class BoardInteractor {
   private static eventSubscription = new Subscription();
   private static svg: SVGSVGElement;
@@ -21,6 +27,20 @@ export class BoardInteractor {
   private static wiresList: Array<Wire> = [];
   private static idCounter = 0;
   private static boardState: BoardState;
+  private static mouseStart: {
+    x: number;
+    y: number;
+  } = {
+    x: -1,
+    y: -1,
+  };
+  private static mouseEnd: {
+    x: number;
+    y: number;
+  } = {
+    x: -1,
+    y: -1,
+  };
   private static wiresToBuildCoords: {
     main: null | {
       x1: number;
@@ -46,16 +66,8 @@ export class BoardInteractor {
     bend: null
   };
   private static wireData: {
-    start: {
-      element: DcbElement,
-      pin?: Pin,
-      isJunction?: boolean;
-    } | null,
-    end: {
-      element: DcbElement,
-      pin?: Pin,
-      isJunction?: boolean;
-    } | null,
+    start: WireData | null,
+    end: WireData | null,
   } = {
     start: null,
     end: null
@@ -353,6 +365,9 @@ export class BoardInteractor {
     const {x1, y1, x2, y2} = this.coords;
     const plot = this.wiresToBuildModels.main ? this.wiresToBuildModels.main.plot() : null;
 
+    this.mouseStart = {x: x1, y: y1};
+    this.mouseEnd = {x: x2, y: y2};
+
     if (this.wiresToBuildModels.main) {
       this.wiresToBuildModels.main.remove();
     }
@@ -493,13 +508,23 @@ export class BoardInteractor {
         main.initialize();
 
         if (this.wireData.start) {
-          const {element, pin} = this.wireData.start;
+          const {element, pin, isJunction} = this.wireData.start;
+          const {x, y} = this.mouseStart;
+
+          if (isJunction && element instanceof Wire) {
+            element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
+          }
 
           main.wireTo(element, pin);
         }
 
         if (this.wireData.end && !this.wiresToBuildCoords.bend) {
-          const {element, pin} = this.wireData.end;
+          const {element, pin, isJunction} = this.wireData.end;
+          const {x, y} = this.mouseEnd;
+
+          if (isJunction && element instanceof Wire) {
+            element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
+          }
 
           main.wireTo(element, pin);
         }
@@ -521,7 +546,13 @@ export class BoardInteractor {
         }
 
         if (this.wireData.end) {
-          const {element, pin} = this.wireData.end;
+          const {element, pin, isJunction} = this.wireData.end;
+
+          const {x, y} = this.mouseEnd;
+
+          if (isJunction && element instanceof Wire) {
+            element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
+          }
 
           bend.wireTo(element, pin);
         }

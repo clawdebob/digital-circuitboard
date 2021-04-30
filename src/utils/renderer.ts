@@ -39,8 +39,8 @@ class Renderer {
 
   public static createCircle(x: number, y: number, diameter: number): Circle {
     return this.svg.circle(diameter)
-      .x(x)
-      .y(y);
+      .x(x  - diameter / 2)
+      .y(y  - diameter / 2);
   }
 
   public static makeElementBase(element: DcbElement, x: number, y: number, isGhost = false): Element {
@@ -67,7 +67,7 @@ class Renderer {
   private static createHelper(x: number, y: number): Circle {
     const diameter = 10;
 
-    return this.createCircle(x  - diameter / 2, y - diameter / 2, diameter)
+    return this.createCircle(x, y, diameter)
       .addClass('help-circle')
       .opacity(0)
       .fill('#00000000')
@@ -77,10 +77,21 @@ class Renderer {
   private static createInvertCircle(x: number, y: number): Circle {
     const diameter = 7;
 
-    return this.createCircle(x  - diameter / 2, y - diameter / 2, diameter)
+    return this.createCircle(x, y, diameter)
       .addClass('invert-circle')
       .fill('#ffffff')
       .stroke('#000000');
+  }
+
+  public static createJunction(x: number, y: number, color = '#000000'): Circle {
+    const diameter = 6;
+    const circle = this.createCircle(x, y, diameter)
+      .addClass('junction')
+      .fill(color);
+
+    this.background.add(circle);
+
+    return circle;
   }
 
   public static createWireModel(x1: number, y1: number, x2: number, y2: number): Line {

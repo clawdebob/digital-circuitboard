@@ -34,6 +34,7 @@ export class Wire extends DcbElement {
   public value: Signal = undefined;
   public valueUpdate: BehaviorSubject<Signal> = new BehaviorSubject<Signal>(undefined);
   public name = ELEMENT.WIRE;
+  public junctions: Array<Circle> = [];
 
   constructor() {
     super(ELEMENT.WIRE);
@@ -57,7 +58,7 @@ export class Wire extends DcbElement {
 
   public wireTo(element: DcbElement | Wire, pin?: Pin): void {
     if (
-      !_.find(this.wiredTo, elementData => elementData.element.id === element.id)
+      !_.some(this.wiredTo, elementData => elementData.element.id === element.id)
       && this.wiredTo.length < 2
     ) {
       if (pin) {
@@ -139,7 +140,7 @@ export class Wire extends DcbElement {
 
     if (
       _.every(this.wiredTo, element => element.pin && element.pin.type === PIN_TYPES_ENUM.OUT)
-      && this.wiredTo.length === 2
+      // && this.wiredTo.length === 2
     ) {
       if (_.some(this.wiredTo, element => element.pin && element.pin.value !== signal)) {
         this.value = null;
@@ -157,14 +158,20 @@ export class Wire extends DcbElement {
       }
     }
 
+    const stateColor = this.getStateColor(this.value);
+
     if (this.modelData.model) {
-      this.modelData.model.stroke(this.getStateColor(this.value));
+      this.modelData.model.stroke(stateColor);
     }
 
     _.forEach(this.wiredTo, element => {
       if (element.pin && element.pin.model) {
-        element.pin.model.stroke(this.getStateColor(this.value));
+        element.pin.model.stroke(stateColor);
       }
+    });
+
+    _.forEach(this.junctions, model => {
+      model.fill(stateColor);
     });
 
     this.valueUpdate.next(this.value);
