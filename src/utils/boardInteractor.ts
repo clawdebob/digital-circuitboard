@@ -515,7 +515,7 @@ export class BoardInteractor {
             element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
           }
 
-          main.wireTo(element, pin);
+          main.wireTo(element, pin, isJunction);
         }
 
         if (this.wireData.end && !this.wiresToBuildCoords.bend) {
@@ -526,7 +526,7 @@ export class BoardInteractor {
             element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
           }
 
-          main.wireTo(element, pin);
+          main.wireTo(element, pin, isJunction);
         }
 
         this.wiresList.push(main);
@@ -554,7 +554,7 @@ export class BoardInteractor {
             element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
           }
 
-          bend.wireTo(element, pin);
+          bend.wireTo(element, pin, isJunction);
         }
 
         this.wiresList.push(bend);

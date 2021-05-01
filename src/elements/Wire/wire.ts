@@ -56,10 +56,10 @@ export class Wire extends DcbElement {
     }
   }
 
-  public wireTo(element: DcbElement | Wire, pin?: Pin): void {
+  public wireTo(element: DcbElement | Wire, pin?: Pin, viaJunction = false): void {
     if (
       !_.some(this.wiredTo, elementData => elementData.element.id === element.id)
-      && this.wiredTo.length < 2
+      // && this.wiredTo.length < 2
     ) {
       if (pin) {
         this.wiredTo.push({
@@ -82,7 +82,7 @@ export class Wire extends DcbElement {
           const elementSubscription = this.valueUpdate
             .pipe(
               distinctUntilChanged(),
-              filter(value => value !== pin.value)
+              // filter(value => value !== pin.value)
             )
             .subscribe(value => {
               pin.value = value;
@@ -109,7 +109,7 @@ export class Wire extends DcbElement {
           ]);
         });
 
-        if (closestHelper) {
+        if (closestHelper && !viaJunction) {
           this.toggleHelper(closestHelper, false);
         }
 
@@ -135,6 +135,40 @@ export class Wire extends DcbElement {
     }
   }
 
+  public recursiveUpdate(value: Signal): void {
+    const updatedWires: string[] = [];
+
+    const upd = (wire: Wire) => {
+      const id = wire.id;
+      const wires = _.chain(wire.wiredTo)
+        .map('element')
+        .filter(element => element instanceof Wire && !_.includes(updatedWires, element.id))
+        .value() as Wire[];
+
+      updatedWires.push(id);
+
+      if (wires.length) {
+        _.forEach(wires, wire => {
+          upd(wire);
+        });
+      } else {
+        _.forEach(wire.wiredTo, ({element, pin}) => {
+          if (pin && pin.type === PIN_TYPES_ENUM.IN) {
+            element.inPins[pin.index].value = value;
+          }
+        });
+      }
+    };
+
+    _.forEach(this.wiredTo, ({element, pin}) => {
+      if (pin && pin.type === PIN_TYPES_ENUM.IN) {
+        element.inPins[pin.index].value = value;
+      }
+    });
+
+    upd(this);
+  }
+
   public updateState(signal?: Signal): void {
     this.value = signal;
 
@@ -156,6 +190,8 @@ export class Wire extends DcbElement {
           this.value = pinValue;
         }
       }
+
+      this.recursiveUpdate(this.value);
     }
 
     const stateColor = this.getStateColor(this.value);
