@@ -49,6 +49,10 @@ export class Wire extends DcbElement {
   private toggleHelper(helper: WireHelper, value = true) {
     helper.isEnabled = value;
 
+    if (!value) {
+      helper.model.opacity(0);
+    }
+
     if (Renderer.background && Renderer.foreground) {
       const layer = value ? Renderer.foreground : Renderer.background;
 
@@ -66,6 +70,16 @@ export class Wire extends DcbElement {
           element,
           pin
         });
+        const {coords} = element.positionData;
+        const [{x: ex, y: ey}] = coords;
+
+        const closestHelper = _.minBy(this.helpers,
+            helper => Math.abs(Math.pow(ex - helper.model.x(), 2) - Math.pow(ey - helper.model.y(), 2))
+        );
+
+        if (closestHelper) {
+          this.toggleHelper(closestHelper, false);
+        }
 
         if (pin.type === PIN_TYPES_ENUM.OUT) {
           const sub = pin.valueUpdate
@@ -96,21 +110,33 @@ export class Wire extends DcbElement {
       }
 
       if (element instanceof Wire) {
-        const helperCoords = _.map(element.helpers, helper => ({
-          x: helper.model.x(),
-          y: helper.model.y()
-        }));
-        const closestHelper = _.minBy(this.helpers, helper => {
-          const [{x: x1, y: y1}, {x: x2, y: y2}] = helperCoords;
+        const {orientation, coords} = this.positionData;
 
-          return _.min([
-            Math.abs(Math.pow(x1 - helper.model.x(), 2) - Math.pow(y1 - helper.model.y(), 2)),
-            Math.abs(Math.pow(x2 - helper.model.x(), 2) - Math.pow(y2 - helper.model.y(), 2))
-          ]);
+        /*
+        * To find out which helper needs to be disabled during wiring, the closest one should be found by calculating a distance.
+        * The distance between a point and a line, when line is represented like Ax + By + C = 0, is calculated as
+        * |A * x0 + B * y0 + C| / sqrt(A^2 + B^2) where (x0, y0) are the point's coords.
+        * All wires are represented by either horizontal or vertical straight lines, no diagonal wires are allowed. So:
+        * 1. For any vertical wire the equation will be x = C -> -x + C = 0 -> Ax + C = 0,
+        *    where A = -1, B = 0, C = x1, where x1 is a const x value.
+        * 2. For any horizontal wire the equation will be y = C -> -y + C = 0 -> By + C = 0,
+        *    where A = 0, B = -1, C = y1, where y1 is a const y value.
+        */
+
+        const closestHelper = _.minBy(element.helpers, helper => {
+          const [{x, y}] = coords;
+          const x0 = helper.model.x();
+          const y0 = helper.model.y();
+
+          if (orientation === ORIENTATION.VERTICAL) {
+            return Math.abs(-x0 + x);
+          }
+
+          return Math.abs(-y0 + y);
         });
 
         if (closestHelper && !viaJunction) {
-          this.toggleHelper(closestHelper, false);
+          element.toggleHelper(closestHelper, false);
         }
 
         this.wiredTo.push({
