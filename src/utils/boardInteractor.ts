@@ -440,8 +440,19 @@ export class BoardInteractor {
       wireToProlong.helpers[0].model.x(x1 - 5).y(y1 - 5);
       wireToProlong.helpers[1].model.x(x2 - 5).y(y2 - 5);
 
+      const isFirstBorderJunctionEnabled = wireToProlong.junctionHelpers[0].isEnabled;
+      const isLastBorderJunctionEnabled = wireToProlong.junctionHelpers[wireToProlong.junctionHelpers.length - 1].isEnabled;
+
       wireToProlong.resetJunctionHelpers();
       wireToProlong.junctionHelpers = Renderer.getJunctionHelpers(x1, y1, x2, y2);
+
+      if (isFirstBorderJunctionEnabled) {
+        wireToProlong.toggleHelper(wireToProlong.junctionHelpers[0]);
+      }
+
+      if (isLastBorderJunctionEnabled) {
+        wireToProlong.toggleHelper(wireToProlong.junctionHelpers[wireToProlong.junctionHelpers.length - 1]);
+      }
 
       this.applyJunctionHelpers(wireToProlong);
     };

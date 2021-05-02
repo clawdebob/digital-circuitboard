@@ -46,7 +46,7 @@ export class Wire extends DcbElement {
     }
   }
 
-  private toggleHelper(helper: WireHelper, value = true) {
+  public toggleHelper(helper: WireHelper, value = true) {
     helper.isEnabled = value;
 
     if (!value) {
@@ -79,6 +79,16 @@ export class Wire extends DcbElement {
 
         if (closestHelper) {
           this.toggleHelper(closestHelper, false);
+
+          const helperModel = closestHelper.model;
+
+          const junctionHelper = _.minBy(this.junctionHelpers, helper =>
+            Math.abs(Math.pow(helperModel.x() - helper.model.x(), 2) - Math.pow(helperModel.y() - helper.model.y(), 2))
+          );
+
+          if (junctionHelper) {
+            this.toggleHelper(junctionHelper);
+          }
         }
 
         if (pin.type === PIN_TYPES_ENUM.OUT) {
@@ -114,7 +124,7 @@ export class Wire extends DcbElement {
 
         /*
         * To find out which helper needs to be disabled during wiring, the closest one should be found by calculating a distance.
-        * The distance between a point and a line, when line is represented like Ax + By + C = 0, is calculated as
+        * The distance between a point and a line, when line is represented by an equation like Ax + By + C = 0, is calculated as
         * |A * x0 + B * y0 + C| / sqrt(A^2 + B^2) where (x0, y0) are the point's coords.
         * All wires are represented by either horizontal or vertical straight lines, no diagonal wires are allowed. So:
         * 1. For any vertical wire the equation will be x = C -> -x + C = 0 -> Ax + C = 0,
@@ -137,6 +147,23 @@ export class Wire extends DcbElement {
 
         if (closestHelper && !viaJunction) {
           element.toggleHelper(closestHelper, false);
+        }
+
+        // @TO DO refactor copy paste
+        const closestJunctionHelper = _.minBy(element.junctionHelpers, helper => {
+          const [{x, y}] = coords;
+          const x0 = helper.model.x();
+          const y0 = helper.model.y();
+
+          if (orientation === ORIENTATION.VERTICAL) {
+            return Math.abs(-x0 + x);
+          }
+
+          return Math.abs(-y0 + y);
+        });
+
+        if (closestJunctionHelper) {
+          element.toggleHelper(closestJunctionHelper);
         }
 
         this.wiredTo.push({

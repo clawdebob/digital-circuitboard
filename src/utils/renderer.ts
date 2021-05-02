@@ -109,7 +109,7 @@ class Renderer {
     const helpers = [];
 
     if (y1 < y2 || x1 < x2) {
-      for (let coord = startCoord + 13; coord < endCoord - 12; coord += 12) {
+      for (let coord = startCoord + 1; coord < endCoord; coord += 12) {
         helpers.push({
           isEnabled: true,
           model: this.createHelper(
@@ -119,7 +119,7 @@ class Renderer {
         });
       }
     } else {
-      for (let coord = startCoord - 13; coord > endCoord + 12; coord -= 12) {
+      for (let coord = startCoord - 1; coord > endCoord; coord -= 12) {
         helpers.push({
           isEnabled: true,
           model: this.createHelper(
@@ -130,7 +130,14 @@ class Renderer {
       }
     }
 
-    _.forEach(helpers, data => {
+    _.forEach(helpers, (data, idx) => {
+      if (idx === 0 || idx === helpers.length - 1) {
+        data.isEnabled = false;
+        this.background.add(data.model);
+
+        return;
+      }
+
       this.foreground.add(data.model);
     });
 
