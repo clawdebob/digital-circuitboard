@@ -504,6 +504,7 @@ export class BoardInteractor {
         this.wireData.start
         && this.wireData.start.element instanceof Wire
         && mainOrientation === this.wireData.start.element.positionData.orientation
+        && !this.wireData.start.isJunction
       ) {
         const {element} = this.wireData.start;
         const newWire = this.prolongWire(element, x1, y1, x2, y2);
