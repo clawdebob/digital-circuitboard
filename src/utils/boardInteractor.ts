@@ -496,13 +496,16 @@ export class BoardInteractor {
       const mainOrientation = x1 === x2 ? ORIENTATION.VERTICAL : ORIENTATION.HORIZONTAL;
       let main;
 
-      if (Math.abs(Math.pow(x1 - x2, 2) - Math.pow(y1 - y2, 2)) < 12) {
+      if (
+        Math.abs(Math.pow(x1 - x2, 2) - Math.pow(y1 - y2, 2)) < 12
+        || !this.wireData.start
+        || (this.wireData.start && this.wireData.end && this.wireData.end.element.id === this.wireData.start.element.id)
+      ) {
         return;
       }
 
       if (
-        this.wireData.start
-        && this.wireData.start.element instanceof Wire
+        this.wireData.start.element instanceof Wire
         && mainOrientation === this.wireData.start.element.positionData.orientation
         && !this.wireData.start.isJunction
       ) {
@@ -519,16 +522,14 @@ export class BoardInteractor {
         this.applyWireHelpers(main);
         main.initialize();
 
-        if (this.wireData.start) {
-          const {element, pin, isJunction} = this.wireData.start;
-          const {x, y} = this.mouseStart;
+        const {element, pin, isJunction} = this.wireData.start;
+        const {x, y} = this.mouseStart;
 
-          if (isJunction && element instanceof Wire) {
-            element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
-          }
-
-          main.wireTo(element, pin, isJunction);
+        if (isJunction && element instanceof Wire) {
+          element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
         }
+
+        main.wireTo(element, pin, isJunction);
 
         if (this.wireData.end && !this.wiresToBuildCoords.bend) {
           const {element, pin, isJunction} = this.wireData.end;

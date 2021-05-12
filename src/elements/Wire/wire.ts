@@ -175,7 +175,6 @@ export class Wire extends DcbElement {
         const sub = element.valueUpdate
           .pipe(
             map(() => element.value),
-            distinctUntilChanged(),
             filter(value => value !== this.value),
             skipWhile(value => value === undefined)
           )
@@ -207,7 +206,13 @@ export class Wire extends DcbElement {
       } else {
         _.forEach(wire.wiredTo, ({element, pin}) => {
           if (pin && pin.type === PIN_TYPES_ENUM.IN) {
-            element.inPins[pin.index].value = value;
+            if (pin.type === PIN_TYPES_ENUM.IN) {
+              element.inPins[pin.index].value = value;
+            } else {
+              if (pin.value !== value) {
+                element.outPins[pin.index].value = null;
+              }
+            }
           }
         });
       }
