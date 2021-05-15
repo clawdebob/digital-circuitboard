@@ -40,13 +40,13 @@ export class Wire extends DcbElement {
     super(ELEMENT.WIRE);
   }
 
-  public initialize() {
+  public initialize(): void {
     if (this.modelData.model) {
       this.modelData.model.stroke(this.getStateColor(undefined));
     }
   }
 
-  public toggleHelper(helper: WireHelper, value = true) {
+  public toggleHelper(helper: WireHelper, value = true): void {
     helper.isEnabled = value;
 
     if (!value) {

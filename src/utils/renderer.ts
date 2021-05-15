@@ -265,17 +265,17 @@ class Renderer {
     this.background.add(group);
   }
 
-  public static setBoardZoom(zoom: number, mouseX: number, mouseY: number): void {
-    const {left, top} = this.svg.node.getBoundingClientRect();
-    const scale = zoom / 100;
-    const x = (mouseX - left) / scale;
-    const y = (mouseY - top) / scale;
-
-    this.svg.transform({scaleX: scale, scaleY: scale});
-
-    const {width, height} = this.svg.node.getBoundingClientRect();
-    this.svg.size(width, height);
-  }
+  // public static setBoardZoom(zoom: number, mouseX: number, mouseY: number): void {
+  //   const {left, top} = this.svg.node.getBoundingClientRect();
+  //   const scale = zoom / 100;
+  //   const x = (mouseX - left) / scale;
+  //   const y = (mouseY - top) / scale;
+  //
+  //   this.svg.transform({scaleX: scale, scaleY: scale});
+  //
+  //   const {width, height} = this.svg.node.getBoundingClientRect();
+  //   this.svg.size(width, height);
+  // }
 }
 
 export default Renderer;

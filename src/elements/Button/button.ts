@@ -32,7 +32,7 @@ class Button extends DcbElement {
     );
   }
 
-  initialize() {
+  initialize(): void {
     if (this.modelData.model) {
       const modelGroup = this.modelData.model.node;
       const onClick$ = fromEvent(modelGroup, 'click')
@@ -50,7 +50,7 @@ class Button extends DcbElement {
     this.updateState();
   }
 
-  operation() {
+  operation(): void {
     const signal = this.props.initialSignal;
     const color = this.getStateColor(signal);
 

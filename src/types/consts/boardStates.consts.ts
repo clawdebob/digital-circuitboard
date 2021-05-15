@@ -1,4 +1,5 @@
 import {DcbElement} from '../../elements/dcbElement';
+import {OptionsMap} from '../menuCache.type';
 
 export enum BOARD_STATES_ENUM {
   WIRE = 'wire',
@@ -19,4 +20,5 @@ export type BoardState = BOARD_STATES_ENUM.WIRE
 export interface StoreBoardState {
   boardState: BoardState,
   currentElement: DcbElement | null,
+  propsCache: OptionsMap,
 }

@@ -29,6 +29,6 @@ const Button = (props: ButtonProps): React.ReactElement => {
       {t(props.text)}
     </button>
   );
-}
+};
 
 export default Button;

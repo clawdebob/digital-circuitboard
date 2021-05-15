@@ -27,7 +27,7 @@ const MAIN_MENU_OPTIONS = [
     name: 'main-menu.export',
     subOptions: [
       {name: 'main-menu.options.save-as-svg', action: _.noop},
-      {name: 'main-menu.options.save-as-png', action: () => console.log('click')},
+      {name: 'main-menu.options.save-as-png', action: _.noop},
     ]
   },
 ];

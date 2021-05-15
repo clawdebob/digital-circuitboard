@@ -44,7 +44,7 @@
       {
         "conditionalAssign": false,
         "nestedBinaryExpressions": false,
-        "ignoreJSX": "none",
+        "ignoreJSX": "all",
         "enforceForArrowConditionals": false
       }
     ],

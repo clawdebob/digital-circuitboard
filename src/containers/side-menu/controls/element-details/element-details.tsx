@@ -11,14 +11,15 @@ import {
   DetailsValueType,
   ElementProperty
 } from '../../../../types/consts/elementDetails.consts';
-import {setCurrentElement} from '../../../../store/actions/boardActions';
+import {setCurrentElement, updateElementPropsCache} from '../../../../store/actions/boardActions';
 import elementBuilder from '../../../../utils/elementBuilder';
-import {DcbElementName} from '../../../../types/consts/element.consts';
 import {fromEvent} from 'rxjs';
 import {pluck} from 'rxjs/operators';
+import {OptionsMap} from '../../../../types/menuCache.type';
 
 export interface ElementDetailsProps {
   currentElement: DcbElement | null;
+  elementPropsCache: OptionsMap;
   className?: string;
 }
 
@@ -43,9 +44,16 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
     newElement.inPins[pinIdx].invert = value === 'true';
 
     dispatch(setCurrentElement(newElement));
+    dispatch(updateElementPropsCache(newElement));
   };
 
-  const getInvertPinsOptions = (pinsCount: number, elementName: DcbElementName) => {
+  const getInvertPinsOptions = () => {
+    if (!props.currentElement) {
+      return [null];
+    }
+
+    const element = props.currentElement;
+    const pinsCount = element.inPins.length;
     const pinsRange = _.range(0, pinsCount);
 
     if (pinsCount < 2) {
@@ -53,7 +61,7 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
     }
 
     return _.map(pinsRange, pinNum => {
-      const key = `${elementName}_invert_${pinNum}`;
+      const key = `${element.name}_invert_${pinNum}`;
 
       return (
         <tr
@@ -62,12 +70,10 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
           <td key={`invert_${pinNum}`}>
             <span className="prop-name">{t('props.invert') + ` ${pinNum}`}</span>
           </td>
-          <td
-            key={key}
-          >
+          <td key={key}>
           <span>
             <select
-              defaultValue="false"
+              defaultValue={String(element.inPins[pinNum].invert)}
               onChange={e => updateElementPins(pinNum, e.target.value)}
               name={key}
               className="prop-input"
@@ -103,7 +109,10 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
         return;
     }
 
-    dispatch(setCurrentElement(createElement(dimensions, props)));
+    const newElement = createElement(dimensions, props);
+
+    dispatch(setCurrentElement(newElement));
+    dispatch(updateElementPropsCache(newElement));
   };
 
   const generateOptions = (type: DetailsValueType): Array<React.ReactElement> => {
@@ -167,15 +176,11 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
       const inputLabel = label ? t(`props.${label}`) : null;
 
       return (
-        <tr
-          key={key}
-        >
+        <tr key={key}>
           <td key={prop}>
             <span className="prop-name">{inputLabel || prop}</span>
           </td>
-          <td
-            key={key}
-          >
+          <td key={key}>
             <span>
               { inputType !== 'select' || !valueType ? (
                 <input
@@ -219,7 +224,7 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
           <th>{t('value')}</th>
         </tr>
         {generatePropsFields()}
-        {getInvertPinsOptions(currentElement.inPins.length, currentElement.name)}
+        {getInvertPinsOptions()}
         </tbody>
       </table>
     </div>
@@ -228,6 +233,7 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
 
 const mapStateToProps = (state: RootState) => ({
   currentElement: state.board.currentElement,
+  elementPropsCache: state.board.propsCache,
 });
 
 export default connect(mapStateToProps)(ElementDetails);

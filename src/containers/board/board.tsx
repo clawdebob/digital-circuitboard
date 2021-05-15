@@ -5,9 +5,6 @@ import {BoardState} from '../../types/consts/boardStates.consts';
 import './board.scss';
 import {DcbElement} from '../../elements/dcbElement';
 import Renderer from '../../utils/renderer';
-import {fromEvent} from 'rxjs';
-import {filter} from 'rxjs/operators';
-import * as _ from 'lodash';
 import {BoardInteractor} from '../../utils/boardInteractor';
 
 export interface BoardProps {
@@ -18,32 +15,32 @@ export interface BoardProps {
 const Board = (props: BoardProps) => {
   const boardWrapper = useRef<HTMLDivElement>(null);
   const boardContainer = useRef<HTMLDivElement>(null);
-  const zoom = useRef<number>(100);
+  // const zoom = useRef<number>(100);
 
   useEffect(() => {
     if (boardWrapper.current && boardContainer.current && !Renderer.board) {
       BoardInteractor.init(boardWrapper.current as HTMLElement);
 
-      fromEvent<React.WheelEvent>(boardContainer.current, 'wheel')
-        .pipe(
-          filter(e => e.ctrlKey)
-        ).subscribe(e => {
-          if (!boardContainer.current) {
-            return;
-          }
-
-          e.preventDefault();
-
-          const {top, left} = boardContainer.current.getBoundingClientRect();
-
-          const zoomStep = e.deltaY < 0 ? 10 : -10;
-          const nextZoomVal = zoom.current + zoomStep;
-
-          if (nextZoomVal >= 20 && nextZoomVal <= 200) {
-            zoom.current = nextZoomVal;
-            // Renderer.setBoardZoom(zoom.current, e.pageX, e.pageY);
-          }
-        });
+      // fromEvent<React.WheelEvent>(boardContainer.current, 'wheel')
+      //   .pipe(
+      //     filter(e => e.ctrlKey)
+      //   ).subscribe(e => {
+      //     if (!boardContainer.current) {
+      //       return;
+      //     }
+      //
+      //     e.preventDefault();
+      //
+      //     const {top, left} = boardContainer.current.getBoundingClientRect();
+      //
+      //     const zoomStep = e.deltaY < 0 ? 10 : -10;
+      //     const nextZoomVal = zoom.current + zoomStep;
+      //
+      //     if (nextZoomVal >= 20 && nextZoomVal <= 200) {
+      //       zoom.current = nextZoomVal;
+      //       Renderer.setBoardZoom(zoom.current, e.pageX, e.pageY);
+      //     }
+      //   });
     }
   });
 
