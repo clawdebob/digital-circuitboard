@@ -122,7 +122,7 @@ const ElementDetails = (props: ElementDetailsProps): React.ReactElement | null =
 
     switch(type) {
       case DETAILS_VALUE_TYPES_ENUM.SIGNAL:
-        return getOptionArray([0, 1]);
+        return _.map([0, 1], val => (<option key={val} value={String(Boolean(val))}>{val}</option>));
       case DETAILS_VALUE_TYPES_ENUM.PIN_RANGE:
         return getOptionArray(_.range(2, currentElement.maxContacts + 1));
       case DETAILS_VALUE_TYPES_ENUM.FONT_SIZE:
