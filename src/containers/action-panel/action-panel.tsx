@@ -27,7 +27,7 @@ const MENU_ACTIONS: Array<PanelAction> = [
   {name: 'create-outContact', icon: 'fxemoji:radiobutton', title: 'action.create-out-contact', type: PANEL_ACTION_ENUM.CREATE_ELEMENT},
 ];
 
-const ActionPanel = () => {
+const ActionPanel = (): React.ReactElement => {
   const dispatch = useDispatch();
   const {t} = useTranslation();
 

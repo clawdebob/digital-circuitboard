@@ -43,7 +43,10 @@ const ElementGroupElements = (props: ElementGroupElementsProps): React.ReactElem
       title={t(element.name)}
       onClick={() => handleClick(element)}
     >
-      <img src={element.icon.default} alt={t(element.name)}/>
+      <img
+        src={element.icon.default}
+        alt={t(element.name)}
+      />
     </div>
   ));
 

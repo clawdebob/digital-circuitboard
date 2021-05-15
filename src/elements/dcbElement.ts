@@ -227,7 +227,7 @@ export abstract class DcbElement implements ElementParams {
   public updateState(): void {
     if (this.inPins.length) {
       _.forEach(this.inPins, pin => {
-        if (pin.invert) {
+        if (pin.invert && pin.value !== null && pin.value !== undefined) {
           pin.value = !pin.value;
         }
 
