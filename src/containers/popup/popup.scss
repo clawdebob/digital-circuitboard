@@ -1,0 +1,19 @@
+@import "src/styles/mixins";
+
+.popup {
+  @include __overlay-window();
+
+  .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 26px;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: $menu-hover;
+    }
+  }
+}
+

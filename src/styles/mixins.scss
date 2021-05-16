@@ -1,0 +1,11 @@
+@import "variables";
+
+@mixin __overlay-window {
+  background-color: $menu-color;
+  border-radius: 16px;
+  padding: 45px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+}
