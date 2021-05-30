@@ -1,16 +1,16 @@
 import {fromEvent, Subscription} from 'rxjs';
-import Renderer from './renderer';
-import {BOARD_STATES_ENUM, BoardState} from '../types/consts/boardStates.consts';
+import Renderer from '../../../utils/renderer';
+import {BOARD_STATES_ENUM, BoardState} from '../../../types/consts/boardStates.consts';
 import {Element, Line} from '@svgdotjs/svg.js';
-import {DcbElement} from '../elements/dcbElement';
+import {DcbElement} from '../../../elements/dcbElement';
 import React from 'react';
 import * as _ from 'lodash';
 import {filter} from 'rxjs/operators';
-import {Pin} from '../elements/Pin/pin';
-import store from '../store/store';
-import {setBoardState} from '../store/actions/boardActions';
-import {Wire} from '../elements/Wire/wire';
-import {ORIENTATION} from '../types/consts/orientation.const';
+import {Pin} from '../../../elements/Pin/pin';
+import store from '../../../store/store';
+import {setBoardState} from '../../../store/actions/boardActions';
+import {Wire} from '../../../elements/Wire/wire';
+import {ORIENTATION} from '../../../types/consts/orientation.const';
 
 interface WireData {
   element: DcbElement;
@@ -214,7 +214,7 @@ export class BoardInteractor {
           store.dispatch(setBoardState(BOARD_STATES_ENUM.WIRE));
         });
 
-      wire.subscriptions.add(mouseDown$);
+      wire.eventSubscriptions.add(mouseDown$);
 
       const mouseUp$ = fromEvent<React.MouseEvent>(helper.model.node, 'mouseup')
         .pipe(
@@ -227,7 +227,7 @@ export class BoardInteractor {
           };
         });
 
-      wire.subscriptions.add(mouseUp$);
+      wire.eventSubscriptions.add(mouseUp$);
 
       const mouseMove$ = fromEvent<React.MouseEvent>(helper.model.node, 'mousemove')
         .pipe(
@@ -238,7 +238,7 @@ export class BoardInteractor {
           helper.model.opacity(1);
         });
 
-      wire.subscriptions.add(mouseMove$);
+      wire.eventSubscriptions.add(mouseMove$);
 
       const mouseOut$ = fromEvent<React.MouseEvent>(helper.model.node, 'mouseout')
         .pipe(
@@ -249,7 +249,7 @@ export class BoardInteractor {
           helper.model.opacity(0);
         });
 
-      wire.subscriptions.add(mouseOut$);
+      wire.eventSubscriptions.add(mouseOut$);
     });
 
     this.applyJunctionHelpers(wire);
@@ -526,7 +526,7 @@ export class BoardInteractor {
         const {x, y} = this.mouseStart;
 
         if (isJunction && element instanceof Wire) {
-          element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
+          main.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
         }
 
         main.wireTo(element, pin, isJunction);
@@ -564,7 +564,7 @@ export class BoardInteractor {
           const {x, y} = this.mouseEnd;
 
           if (isJunction && element instanceof Wire) {
-            element.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
+            bend.junctions.push(Renderer.createJunction(x + 1, y + 1, element.getStateColor(element.value)));
           }
 
           bend.wireTo(element, pin, isJunction);

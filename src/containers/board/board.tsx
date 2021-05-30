@@ -5,7 +5,7 @@ import {BoardState} from '../../types/consts/boardStates.consts';
 import './board.scss';
 import {DcbElement} from '../../elements/dcbElement';
 import Renderer from '../../utils/renderer';
-import {BoardInteractor} from '../../utils/boardInteractor';
+import {BoardInteractor} from './interaction/board-interactor';
 
 export interface BoardProps {
   boardState: BoardState,

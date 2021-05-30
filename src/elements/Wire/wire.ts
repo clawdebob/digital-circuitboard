@@ -11,6 +11,7 @@ import Renderer from '../../utils/renderer';
 export interface WiredElement {
   element: DcbElement;
   pin?: Pin;
+  viaJunction?: boolean;
 }
 
 export interface WireHelper {
@@ -34,7 +35,8 @@ export class Wire extends DcbElement {
   public value: Signal = undefined;
   public valueUpdate: BehaviorSubject<Signal> = new BehaviorSubject<Signal>(undefined);
   public name = ELEMENT.WIRE;
-  public junctions: Array<Circle> = [];
+  public junctions: Array<Circle> = []; // the list of junctions represents junctions by which this wire is wired to other elements
+  public eventSubscriptions = new Subscription();
 
   constructor() {
     super(ELEMENT.WIRE);
@@ -60,7 +62,21 @@ export class Wire extends DcbElement {
     }
   }
 
-  public wireTo(element: DcbElement | Wire, pin?: Pin, viaJunction = false): void {
+  private getClosestHelper(helpersList: Array<WireHelper>, coords: Array<{x: number, y: number}>, orientation: ORIENTATION): WireHelper | undefined {
+    return _.minBy(helpersList, helper => {
+      const [{x, y}] = coords;
+      const x0 = helper.model.x();
+      const y0 = helper.model.y();
+
+      if (orientation === ORIENTATION.VERTICAL) {
+        return Math.abs(-x0 + x);
+      }
+
+      return Math.abs(-y0 + y);
+    });
+  }
+
+  public wireTo(element: DcbElement | Wire, pin?: Pin | null, viaJunction = false): void {
     if (
       !_.some(this.wiredTo, elementData => elementData.element.id === element.id)
       // && this.wiredTo.length < 2
@@ -133,44 +149,24 @@ export class Wire extends DcbElement {
         *    where A = 0, B = -1, C = y1, where y1 is a const y value.
         */
 
-        const closestHelper = _.minBy(element.helpers, helper => {
-          const [{x, y}] = coords;
-          const x0 = helper.model.x();
-          const y0 = helper.model.y();
-
-          if (orientation === ORIENTATION.VERTICAL) {
-            return Math.abs(-x0 + x);
-          }
-
-          return Math.abs(-y0 + y);
-        });
+        const closestHelper = this.getClosestHelper(element.helpers, coords, orientation);
 
         if (closestHelper && !viaJunction) {
           element.toggleHelper(closestHelper, false);
         }
 
-        // @TO DO refactor copy paste
-        const closestJunctionHelper = _.minBy(element.junctionHelpers, helper => {
-          const [{x, y}] = coords;
-          const x0 = helper.model.x();
-          const y0 = helper.model.y();
-
-          if (orientation === ORIENTATION.VERTICAL) {
-            return Math.abs(-x0 + x);
-          }
-
-          return Math.abs(-y0 + y);
-        });
+        const closestJunctionHelper = this.getClosestHelper(element.junctionHelpers, coords, orientation);
 
         if (closestJunctionHelper) {
           element.toggleHelper(closestJunctionHelper);
         }
 
         this.wiredTo.push({
-          element
+          element,
+          viaJunction
         });
 
-        element.wireTo(this);
+        element.wireTo(this, null, viaJunction);
 
         const sub = element.valueUpdate
           .pipe(
@@ -288,9 +284,13 @@ export class Wire extends DcbElement {
       }
     });
 
+    _.forEach(this.junctions, circle => circle.remove());
+
     this.wiredTo = [];
+    this.junctions = [];
     this.subscriptions.unsubscribe();
     this.junctionSubscriptions.unsubscribe();
+    this.eventSubscriptions.unsubscribe();
   }
 
   public get positionData(): PositionData {
@@ -331,13 +331,28 @@ export class Wire extends DcbElement {
   }
 
   public removeWiredElement(element: DcbElement): void {
-    const currentWiredTo = _.filter(this.wiredTo, item => item.element.id !== element.id);
+    const wiredData = _.find(this.wiredTo, item => item.element.id === element.id);
+    const {coords, orientation} = element.positionData;
+
+    if (wiredData && !wiredData.viaJunction && element instanceof Wire) {
+      const closestHelper = this.getClosestHelper(this.helpers, coords, orientation);
+
+      if (closestHelper) {
+        this.toggleHelper(closestHelper, true);
+      }
+
+      const closestJunctionHelper = this.getClosestHelper(this.junctionHelpers, coords, orientation);
+
+      if (closestJunctionHelper) {
+        this.toggleHelper(closestJunctionHelper, false);
+      }
+    }
 
     // TO-DO update when delete will be implemented
+    this.wiredTo = _.filter(this.wiredTo, item => item.element.id !== element.id);
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
-    this.wiredTo = [];
 
-    _.forEach(currentWiredTo, item => this.wireTo(item.element, item.pin));
+    _.forEach(this.wiredTo, item => this.wireTo(item.element, item.pin));
   }
 }
