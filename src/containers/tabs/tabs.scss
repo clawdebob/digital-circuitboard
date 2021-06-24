@@ -1,0 +1,10 @@
+.app {
+  &__tabs {
+    margin: 20px 0;
+
+    &__list {
+      display: flex;
+      border-bottom: 1px solid;
+    }
+  }
+}

@@ -10,10 +10,12 @@ const Popup = (props: React.PropsWithChildren<PopupProps>): React.ReactElement |
   props.isVisible ? (
     <div
       className="fade-curtain"
-      onClick={props.close}
     >
       <div className="popup">
-        <span className="close">
+        <span
+          className="close"
+          onClick={props.close}
+        >
           ✕
         </span>
         {props.children}
