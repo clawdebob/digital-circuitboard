@@ -7,7 +7,7 @@ import SideMenu from './containers/side-menu/side-menu';
 import ActionPanel from './containers/action-panel/action-panel';
 import Popup from './containers/popup/popup';
 import {Switch, Route, useHistory} from 'react-router-dom';
-import Tabs from './containers/tabs/tabs';
+import TabGroup from './containers/tabs/tabGroup';
 
 function App(): React.ReactElement {
   const history = useHistory();
@@ -59,10 +59,14 @@ function App(): React.ReactElement {
         <Route path="/auth">
           <Popup close={closePopup} isVisible={true}>
             <h1>Auth</h1>
-            <Tabs tabsList={['tab-1', 'tab-2']}>
-              <Tabs.Tab id="tab-1" label="tab-1">p</Tabs.Tab>
-              <Tabs.Tab id="tab-2" label="tab-2">p</Tabs.Tab>
-            </Tabs>
+            <TabGroup>
+              <TabGroup.Tab id="tab-1" label="tab-1">
+                <span>Link</span>
+              </TabGroup.Tab>
+              <TabGroup.Tab id="tab-2" label="tab-2">
+                <p onClick={() => console.log('click')}>Statement</p>
+              </TabGroup.Tab>
+            </TabGroup>
           </Popup>
         </Route>
       </Switch>

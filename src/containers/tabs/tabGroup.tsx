@@ -3,16 +3,16 @@ import {mergeCssClasses} from '../../utils/helpers';
 import {TabsProvider} from './context/use-tabs-context';
 import Tab, {TabProps} from './components/tab';
 import './tabs.scss';
+import * as _ from 'lodash';
 
-interface TabsProps {
+interface TabGroupProps {
   className?: string;
-  children: React.ReactNode;
-  tabsList: Array<string>;
+  children: React.ReactNode[];
 }
 
-type TabsComponent = React.FC<TabsProps> & {Tab: React.FC<TabProps>};
+type TabsComponent = React.FC<TabGroupProps> & {Tab: React.FC<TabProps>};
 
-const Tabs: TabsComponent = (props: TabsProps) => {
+const TabGroup: TabsComponent = (props: TabGroupProps) => {
   const [activeTab, setActiveTab] = useState('');
   const className = mergeCssClasses([
     props.className || '',
@@ -20,12 +20,15 @@ const Tabs: TabsComponent = (props: TabsProps) => {
   ]);
 
   useEffect(() => {
-    if (!props.tabsList.length) {
-      throw new Error('Tabs id list is empty');
+    if (!props.children.length) {
+      throw new Error('No tabs provided');
     }
 
-    setActiveTab(props.tabsList[0]);
+    setActiveTab(_.get(props.children, '[0].props.id'));
   }, []);
+
+  const activeTabComponent = _.find(props.children, ['props.id', activeTab]);
+  const activeTabContent = _.get(activeTabComponent, 'props.children');
 
   return (
     <TabsProvider value={{activeTab, setActiveTab}}>
@@ -34,10 +37,11 @@ const Tabs: TabsComponent = (props: TabsProps) => {
           {props.children}
         </div>
       </div>
+      <div className="app__tabs__content">{activeTabContent}</div>
     </TabsProvider>
   );
 };
 
-Tabs.Tab = Tab;
+TabGroup.Tab = Tab;
 
-export default Tabs;
+export default TabGroup;
