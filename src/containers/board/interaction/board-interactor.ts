@@ -6,7 +6,7 @@ import {DcbElement} from '../../../elements/dcbElement';
 import React from 'react';
 import * as _ from 'lodash';
 import {filter} from 'rxjs/operators';
-import {Pin} from '../../../elements/Pin/pin';
+import {Pin, PIN_TYPES_ENUM} from '../../../elements/Pin/pin';
 import store from '../../../store/store';
 import {setBoardState} from '../../../store/actions/boardActions';
 import {Wire} from '../../../elements/Wire/wire';
@@ -495,8 +495,11 @@ export class BoardInteractor {
     return null;
   }
 
-  private static drawWire(e: React.MouseEvent): void {
-    e.preventDefault();
+  private static drawWire(e?: React.MouseEvent): void {
+    // TODO: separate this method from the event
+    if (e) {
+      e.preventDefault();
+    }
 
     if (this.wiresToBuildCoords.main) {
       const {x1, y1, x2, y2} = this.wiresToBuildCoords.main;
@@ -670,7 +673,42 @@ export class BoardInteractor {
       }
     });
 
-    _.forEach(wires);
+    // Phase 1: Collection process
+    const wiresList: Array<Wire> = _.map(wires, wire => {
+      const {positionData} = wire;
+
+      const [{x: x1, y: y1}, {x: x2, y: y2}] = positionData.coords;
+      const wireInstance = Renderer.createWire(x1, y1, x2, y2);
+
+      wireInstance.id = wire.id;
+      this.idCounter++;
+      this.applyWireHelpers(wireInstance);
+      wireInstance.initialize();
+
+      _.forEach(wire.junctions, ([x, y]) => {
+        wireInstance.junctions.push(Renderer.createJunction(x + 3, y + 3, wireInstance.getStateColor(wireInstance.value)));
+      });
+
+      return wireInstance;
+    });
+
+    // Phase 2: Wiring process
+    _.forEach(wiresList, (wire, idx) => {
+      _.forEach(wires[idx].wiredTo, (wired, idx) => {
+        const id = wired.element;
+        const element = _.find(this.elementsList, {id})
+          || _.find(wiresList, {id});
+        const pinIdx = wired.pin.index;
+
+        if (element instanceof Wire) {
+          wire.wireTo(element, null, wired.viaJunction);
+        } else if (element instanceof DcbElement && pinIdx > -1) {
+          const pin = wired.pin.type === PIN_TYPES_ENUM.OUT ? element.outPins[pinIdx] : element.inPins[pinIdx];
+
+          wire.wireTo(element, pin, false);
+        }
+      });
+    });
 
     _.set(window, 'elements', this.elementsList);
     _.set(window, 'wires', this.wiresList);

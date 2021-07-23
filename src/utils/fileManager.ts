@@ -11,7 +11,16 @@ export class FileManager {
     const wiresData = _.map(wires, wire => ({
       name: wire.name,
       id: wire.id,
-      wiredTo: _.map(wire.wiredTo, 'element.id')
+      positionData: wire.positionData,
+      wiredTo: _.map(wire.wiredTo, wired => ({
+        element: wired.element.id,
+        pin: {
+          index: _.get(wired, 'pin.index', -1),
+          type: _.get(wired, 'pin.type', null),
+        },
+        viaJunction: wired.viaJunction,
+      })),
+      junctions: _.map(wire.junctions, junction => [junction.x(), junction.y()]),
     }));
 
     const elementsData = _.map(elements, element => ({
@@ -48,7 +57,6 @@ export class FileManager {
 
   public static async loadData(data: SchemeDataState) {
     if (data) {
-      console.log(data);
       BoardInteractor.loadFile(data);
     }
   }

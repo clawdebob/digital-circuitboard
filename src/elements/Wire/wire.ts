@@ -28,7 +28,7 @@ export interface WireHelper {
 */
 
 export class Wire extends DcbElement {
-  private wiredTo: Array<WiredElement> = [];
+  public wiredTo: Array<WiredElement> = [];
   public helpers: Array<WireHelper> = [];
   public junctionHelpers: Array<WireHelper> = [];
   public junctionSubscriptions = new Subscription();
