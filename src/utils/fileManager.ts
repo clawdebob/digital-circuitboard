@@ -81,6 +81,10 @@ export class FileManager {
     return observable;
   }
 
+  public static newFile() {
+    BoardInteractor.flushScheme();
+  }
+
   public static openFile() {
     const input = document.createElement('input');
 

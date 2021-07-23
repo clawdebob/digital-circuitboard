@@ -17,7 +17,7 @@ function App(): React.ReactElement {
     {
       name: 'main-menu.file',
       subOptions: [
-        {name: 'main-menu.options.file.new', action: _.noop},
+        {name: 'main-menu.options.file.new', action: () => FileManager.newFile()},
         {name: 'main-menu.options.file.open', action: () => FileManager.openFile()},
         {name: 'main-menu.options.file.save', action: () => FileManager.saveFile()},
       ]
