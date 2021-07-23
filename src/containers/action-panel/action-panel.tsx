@@ -1,6 +1,6 @@
 import React from 'react';
 import './action-panel.scss';
-import {BOARD_STATES_ENUM, BoardState} from '../../types/consts/boardStates.consts';
+import {BOARD_STATES_ENUM, BoardState} from '../../store/consts/boardStates.consts';
 import {useDispatch} from 'react-redux';
 import {setBoardState} from '../../store/actions/boardActions';
 import * as _ from 'lodash';

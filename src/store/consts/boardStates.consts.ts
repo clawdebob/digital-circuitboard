@@ -1,5 +1,5 @@
 import {DcbElement} from '../../elements/dcbElement';
-import {OptionsMap} from '../menuCache.type';
+import {OptionsMap} from '../../types/menuCache.type';
 
 export enum BOARD_STATES_ENUM {
   WIRE = 'wire',

@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {useDispatch} from 'react-redux';
 import i18n from 'i18next';
 import {setBoardState} from '../../store/actions/boardActions';
-import {BOARD_STATES_ENUM} from '../../types/consts/boardStates.consts';
+import {BOARD_STATES_ENUM} from '../../store/consts/boardStates.consts';
 import {fromEvent} from 'rxjs';
 import * as _ from 'lodash';
 import './language-selector.scss';

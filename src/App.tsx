@@ -7,6 +7,8 @@ import SideMenu from './containers/side-menu/side-menu';
 import ActionPanel from './containers/action-panel/action-panel';
 import Popup from './containers/popup/popup';
 import {Switch, Route, useHistory} from 'react-router-dom';
+import {FileManager} from './utils/fileManager';
+import FileInput from './containers/file-input/file-input';
 
 function App(): React.ReactElement {
   const history = useHistory();
@@ -16,8 +18,8 @@ function App(): React.ReactElement {
       name: 'main-menu.file',
       subOptions: [
         {name: 'main-menu.options.file.new', action: _.noop},
-        {name: 'main-menu.options.file.open', action: _.noop},
-        {name: 'main-menu.options.file.save', action: _.noop},
+        {name: 'main-menu.options.file.open', action: () => FileManager.openFile()},
+        {name: 'main-menu.options.file.save', action: () => FileManager.saveFile()},
       ]
     },
     {
@@ -61,6 +63,7 @@ function App(): React.ReactElement {
           </Popup>
         </Route>
       </Switch>
+      <FileInput/>
     </div>
   );
 }

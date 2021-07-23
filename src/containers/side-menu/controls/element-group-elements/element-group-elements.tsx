@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import {useTranslation} from 'react-i18next';
 import {connect, useDispatch} from 'react-redux';
 import {setBoardState, setCurrentElement} from '../../../../store/actions/boardActions';
-import {BOARD_STATES_ENUM} from '../../../../types/consts/boardStates.consts';
+import {BOARD_STATES_ENUM} from '../../../../store/consts/boardStates.consts';
 import {OptionsMap} from '../../../../types/menuCache.type';
 import {RootState} from '../../../../types/consts/states.consts';
 

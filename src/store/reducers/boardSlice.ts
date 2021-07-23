@@ -1,4 +1,4 @@
-import {BOARD_STATES_ENUM, StoreBoardState} from '../../types/consts/boardStates.consts';
+import {BOARD_STATES_ENUM, StoreBoardState} from '../consts/boardStates.consts';
 import {ACTIONS_ENUM, StoreAction} from '../../types/consts/actions.consts';
 
 const initialState: StoreBoardState = {

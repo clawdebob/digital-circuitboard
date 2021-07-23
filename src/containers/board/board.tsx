@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {connect} from 'react-redux';
 import {RootState} from '../../types/consts/states.consts';
-import {BoardState} from '../../types/consts/boardStates.consts';
+import {BoardState} from '../../store/consts/boardStates.consts';
 import './board.scss';
 import {DcbElement} from '../../elements/dcbElement';
 import Renderer from '../../utils/renderer';

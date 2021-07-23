@@ -1,6 +1,6 @@
 import {fromEvent, Subscription} from 'rxjs';
 import Renderer from '../../../utils/renderer';
-import {BOARD_STATES_ENUM, BoardState} from '../../../types/consts/boardStates.consts';
+import {BOARD_STATES_ENUM, BoardState} from '../../../store/consts/boardStates.consts';
 import {Element, Line} from '@svgdotjs/svg.js';
 import {DcbElement} from '../../../elements/dcbElement';
 import React from 'react';
@@ -11,6 +11,7 @@ import store from '../../../store/store';
 import {setBoardState} from '../../../store/actions/boardActions';
 import {Wire} from '../../../elements/Wire/wire';
 import {ORIENTATION} from '../../../types/consts/orientation.const';
+import {setSchemeData, setSchemeElements, setSchemeWires} from '../../../store/actions/schemeDataActions';
 
 interface WireData {
   element: DcbElement;
@@ -573,6 +574,8 @@ export class BoardInteractor {
         this.wiresList.push(bend);
         this.idCounter++;
       }
+
+      store.dispatch(setSchemeWires(this.wiresList));
     }
   }
 
@@ -594,6 +597,8 @@ export class BoardInteractor {
     this.applyHelperEvents(element);
     this.elementsList.push(element);
     element.initialize();
+
+    store.dispatch(setSchemeElements(this.elementsList));
   }
 
   private static applySubscriptions(...args: Array<Subscription>): void {

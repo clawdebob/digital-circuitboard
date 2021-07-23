@@ -4,7 +4,7 @@ import {ElementProperties} from '../../types/consts/elementDetails.consts';
 import store from '../../store/store';
 import {ELEMENT} from '../../types/consts/element.consts';
 import {filter} from 'rxjs/operators';
-import {BOARD_STATES_ENUM} from '../../types/consts/boardStates.consts';
+import {BOARD_STATES_ENUM} from '../../store/consts/boardStates.consts';
 
 class Button extends DcbElement {
   public signature = '0';
