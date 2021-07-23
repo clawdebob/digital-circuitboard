@@ -2,6 +2,7 @@ import store from '../store/store';
 import * as _ from 'lodash';
 import {SchemeDataState} from '../store/consts/schemeDataStates.consts';
 import {Subject} from 'rxjs';
+import {BoardInteractor} from '../containers/board/interaction/board-interactor';
 
 export class FileManager {
   public static makeFile(data: SchemeDataState): string {
@@ -18,6 +19,8 @@ export class FileManager {
       id: element.id,
       props: element.props,
       dimensions: element.dimensions,
+      outPins: _.map(element.outPins, pin => _.pick(pin, ['value', 'invert'])),
+      inPins: _.map(element.inPins, pin => _.pick(pin, ['value', 'invert'])),
     }));
 
     return JSON.stringify({
@@ -44,7 +47,10 @@ export class FileManager {
   }
 
   public static async loadData(data: SchemeDataState) {
-    console.log(data);
+    if (data) {
+      console.log(data);
+      BoardInteractor.loadFile(data);
+    }
   }
 
   public static loadFile(file: File) {
@@ -74,7 +80,6 @@ export class FileManager {
     input.setAttribute('accept', '.dcb');
 
     input.onchange = () => {
-
       if (input.files) {
         const file = input.files[0];
 

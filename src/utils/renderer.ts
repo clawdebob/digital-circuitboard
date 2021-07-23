@@ -31,6 +31,12 @@ class Renderer {
     this.foreground = this.board.group();
   }
 
+  public static clearScene(): void {
+    this.background.clear();
+    this.middleGround.clear();
+    this.foreground.clear();
+  }
+
   public static createRect(x: number, y: number, width: number, height: number): Rect {
     return this.svg.rect(width, height)
       .x(x)

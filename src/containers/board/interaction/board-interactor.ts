@@ -11,7 +11,13 @@ import store from '../../../store/store';
 import {setBoardState} from '../../../store/actions/boardActions';
 import {Wire} from '../../../elements/Wire/wire';
 import {ORIENTATION} from '../../../types/consts/orientation.const';
-import {setSchemeData, setSchemeElements, setSchemeWires} from '../../../store/actions/schemeDataActions';
+import {
+  setSchemeData,
+  setSchemeElements,
+  setSchemeWires
+} from '../../../store/actions/schemeDataActions';
+import {SchemeDataState} from '../../../store/consts/schemeDataStates.consts';
+import elementBuilder from '../../../utils/elementBuilder';
 
 interface WireData {
   element: DcbElement;
@@ -579,8 +585,10 @@ export class BoardInteractor {
     }
   }
 
-  private static createElement(e: React.MouseEvent): void {
-    e.preventDefault();
+  private static createElement(e?: React.MouseEvent): void {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (!this.currentElement) {
       return;
@@ -590,7 +598,9 @@ export class BoardInteractor {
 
     Renderer.createElement(element, this.coords.x1, this.coords.y1);
 
-    element.id = `${element.name} ${this.idCounter}`;
+    if (!this.currentElement.id) {
+      element.id = `${element.name} ${this.idCounter}`;
+    }
 
     this.idCounter++;
 
@@ -605,6 +615,65 @@ export class BoardInteractor {
     _.forEach(args, subscription => {
       this.eventSubscription.add(subscription);
     });
+  }
+
+  public static flushScheme(newName = 'Scheme'): void {
+    this.wiresList = [];
+    this.elementsList = [];
+    this.idCounter = 0;
+
+    Renderer.clearScene();
+
+    store.dispatch(setSchemeData({
+      name: newName,
+      wires: [],
+      elements: [],
+    }));
+  }
+
+  public static async loadFile(data: SchemeDataState) {
+    const {elements, wires, name} = data;
+
+    this.flushScheme(name);
+
+    _.forEach(elements, el => {
+      const create = elementBuilder.getCreateFuncByName(el.name);
+
+      this.currentElement = create(
+        el.dimensions,
+        el.props,
+      );
+
+      if (this.currentElement) {
+        this.coords.x1 = this.currentElement.dimensions.x;
+        this.coords.y1 = this.currentElement.dimensions.y;
+        this.currentElement.id = el.id;
+
+        if (this.currentElement.inPins && el.inPins) {
+          this.currentElement.inPins = _.map(this.currentElement.inPins, (pin, idx) => ({
+            ...pin,
+            value: el.inPins[idx].value,
+            invert: el.inPins[idx].invert,
+          }));
+        }
+
+        if (this.currentElement.outPins && el.outPins) {
+          this.currentElement.outPins = _.map(this.currentElement.outPins, (pin, idx) => ({
+            ...pin,
+            value: el.outPins[idx].value
+            ,
+            invert: el.outPins[idx].invert,
+          }));
+        }
+
+        this.createElement();
+      }
+    });
+
+    _.forEach(wires);
+
+    _.set(window, 'elements', this.elementsList);
+    _.set(window, 'wires', this.wiresList);
   }
 
   public static setState(boardState: BoardState, element: DcbElement | null): void {
