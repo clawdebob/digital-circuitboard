@@ -1,10 +1,10 @@
+import Xor from '../Xor/xor';
 import {Dimensions} from '../dcbElement';
-import {ELEMENT} from '../../types/consts/element.consts';
 import {ElementProperties} from '../../types/consts/elementDetails.consts';
-import And from '../And/and';
+import {ELEMENT} from '../../types/consts/element.consts';
 
-class Nand extends And {
-  public constructor(
+class Nxor extends Xor {
+  constructor(
     dimensions: Dimensions = {
       originY: 5,
       width: 50,
@@ -16,7 +16,7 @@ class Nand extends And {
       inContacts: 3,
       fill: '#ffffff',
       outContacts: 1
-    }
+    },
   ) {
     super(
       dimensions,
@@ -24,8 +24,8 @@ class Nand extends And {
       true
     );
 
-    this.name = ELEMENT.NAND;
+    this.name = ELEMENT.NXOR;
   }
 }
 
-export default Nand;
+export default Nxor;

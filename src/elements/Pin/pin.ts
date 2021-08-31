@@ -1,9 +1,10 @@
 import {PositionData, DcbElement} from '../dcbElement';
 import {Line, Circle} from '@svgdotjs/svg.js';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {Wire} from '../Wire/wire';
 
 export type Signal = boolean | null | undefined;
-export type Wired = DcbElement | null;
+export type Wired = Wire | Pin | null;
 
 export enum PIN_TYPES_ENUM {
   IN = 'IN',

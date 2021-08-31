@@ -18,18 +18,22 @@ class Or extends DcbElement {
       inContacts: 3,
       fill: '#ffffff',
       outContacts: 1
-    }
+    },
+    invertOuterPin = false,
   ) {
     super(
       ELEMENT.OR,
       dimensions,
       props,
       ['inContacts', 'fill'],
+      invertOuterPin,
     );
   }
 
 
   public operation(): void {
+    console.log(this.outPins[0].value);
+
     this.outPins[0].value = _.reduce(
       this.inPins,
       (acc: boolean, pin) => acc || Boolean(pin.value),

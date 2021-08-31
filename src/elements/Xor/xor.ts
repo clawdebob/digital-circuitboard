@@ -1,10 +1,10 @@
 import {DcbElement, Dimensions} from '../dcbElement';
-import * as _ from 'lodash';
-import {ELEMENT} from '../../types/consts/element.consts';
 import {ElementProperties} from '../../types/consts/elementDetails.consts';
+import {ELEMENT} from '../../types/consts/element.consts';
+import * as _ from 'lodash';
 
-class And extends DcbElement {
-  public signature = '&';
+class Xor extends DcbElement {
+  public signature = '=1';
 
   public constructor(
     dimensions: Dimensions = {
@@ -17,27 +17,23 @@ class And extends DcbElement {
     props: ElementProperties = {
       inContacts: 3,
       fill: '#ffffff',
-      outContacts: 1,
+      outContacts: 1
     },
-    invertOuterPin = false,
+    invertOutPins = false,
   ) {
     super(
-      ELEMENT.AND,
+      ELEMENT.XOR,
       dimensions,
       props,
       ['inContacts', 'fill'],
-      invertOuterPin
+      invertOutPins,
     );
   }
 
 
   public operation(): void {
-    this.outPins[0].value = _.reduce(
-      this.inPins,
-      (acc: boolean, pin) => acc && Boolean(pin.value),
-      true
-    );
+    this.outPins[0].value = _.countBy(this.inPins, 'value')['true'] >= 1;
   }
 }
 
-export default And;
+export default Xor;

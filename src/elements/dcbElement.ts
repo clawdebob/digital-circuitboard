@@ -227,12 +227,12 @@ export abstract class DcbElement implements ElementParams {
   public updateState(): void {
     if (this.inPins.length) {
       _.forEach(this.inPins, pin => {
-        if (pin.invert && pin.value !== null && pin.value !== undefined) {
-          pin.value = !pin.value;
+        if (pin.invert && pin.wiredTo && pin.value !== null && pin.value !== undefined) {
+          pin.value = !pin.wiredTo.value;
         }
 
         if (pin.model) {
-          pin.model.stroke(this.getStateColor(pin.value));
+          pin.model.stroke(this.getStateColor(pin.wiredTo ? pin.wiredTo.value : pin.value));
         }
       });
     }
@@ -242,6 +242,10 @@ export abstract class DcbElement implements ElementParams {
 
     if (this.outPins.length) {
       _.forEach(this.outPins, pin => {
+        if (pin.invert && pin.value !== null && pin.value !== undefined) {
+          pin.value = !pin.value;
+        }
+
         if (pin.model) {
           pin.model.stroke(this.getStateColor(pin.value));
         }

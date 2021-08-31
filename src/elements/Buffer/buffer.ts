@@ -1,31 +1,31 @@
+import Or from '../Or/or';
 import {Dimensions} from '../dcbElement';
-import {ELEMENT} from '../../types/consts/element.consts';
 import {ElementProperties} from '../../types/consts/elementDetails.consts';
-import And from '../And/and';
+import {ELEMENT} from '../../types/consts/element.consts';
 
-class Nand extends And {
-  public constructor(
+class Buffer extends Or {
+  constructor(
     dimensions: Dimensions = {
       originY: 5,
-      width: 50,
-      height: 60,
+      width: 38,
+      height: 38,
       x: 0,
       y: 0,
     },
     props: ElementProperties = {
-      inContacts: 3,
+      inContacts: 1,
       fill: '#ffffff',
-      outContacts: 1
-    }
+      outContacts: 1,
+    },
   ) {
     super(
       dimensions,
       props,
-      true
     );
 
-    this.name = ELEMENT.NAND;
+    this.name = ELEMENT.BUFFER;
+    this.editableProps = ['fill'];
   }
 }
 
-export default Nand;
+export default Buffer;

@@ -1,22 +1,22 @@
+import Or from '../Or/or';
 import {Dimensions} from '../dcbElement';
 import {ElementProperties} from '../../types/consts/elementDetails.consts';
-import Or from '../Or/or';
 import {ELEMENT} from '../../types/consts/element.consts';
 
-class Nor extends Or {
-  public constructor(
+class Invertor extends Or {
+  constructor(
     dimensions: Dimensions = {
       originY: 5,
-      width: 50,
-      height: 60,
+      width: 38,
+      height: 38,
       x: 0,
       y: 0,
     },
     props: ElementProperties = {
-      inContacts: 3,
+      inContacts: 1,
       fill: '#ffffff',
-      outContacts: 1
-    }
+      outContacts: 1,
+    },
   ) {
     super(
       dimensions,
@@ -24,8 +24,9 @@ class Nor extends Or {
       true,
     );
 
-    this.name = ELEMENT.NOR;
+    this.name = ELEMENT.INVERTOR;
+    this.editableProps = ['fill'];
   }
 }
 
-export default Nor;
+export default Invertor;

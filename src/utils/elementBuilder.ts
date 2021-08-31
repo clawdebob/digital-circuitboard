@@ -7,6 +7,10 @@ import {ElementProperties} from '../types/consts/elementDetails.consts';
 import Button from '../elements/Button/button';
 import Or from '../elements/Or/or';
 import Nor from '../elements/Nor/nor';
+import Xor from '../elements/Xor/xor';
+import Nxor from '../elements/Nxor/nxor';
+import Invertor from '../elements/Invertor/invertor';
+import Buffer from '../elements/Buffer/buffer';
 
 interface BuilderData {
   create: any;
@@ -19,13 +23,13 @@ export default class elementBuilder {
     [ELEMENT.AND, {create: (dimensions?: Dimensions, props?: ElementProperties) => new And(dimensions, props), icon: require('../assets/and.svg')}],
     [ELEMENT.NOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nor(dimensions, props), icon: require('../assets/nor.svg')}],
     [ELEMENT.NAND, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nand(dimensions, props), icon: require('../assets/nand.svg')}],
-    [ELEMENT.XOR, {create: _.noop, icon: require('../assets/xor.svg')}],
-    [ELEMENT.NXOR, {create: _.noop, icon: require('../assets/nxor.svg')}],
+    [ELEMENT.XOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Xor(dimensions, props), icon: require('../assets/xor.svg')}],
+    [ELEMENT.NXOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nxor(dimensions, props), icon: require('../assets/nxor.svg')}],
     [ELEMENT.CONSTANT, {create: _.noop, icon: require('../assets/const.svg')}],
     [ELEMENT.BUTTON, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Button(dimensions, props), icon: require('../assets/button.svg')}],
     [ELEMENT.JUNCTION, {create: _.noop, icon: null}],
-    [ELEMENT.INVERTOR, {create: _.noop, icon: require('../assets/invertor.svg')}],
-    [ELEMENT.BUFFER, {create: _.noop, icon: require('../assets/buffer.svg')}],
+    [ELEMENT.INVERTOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Invertor(dimensions, props), icon: require('../assets/invertor.svg')}],
+    [ELEMENT.BUFFER, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Buffer(dimensions, props), icon: require('../assets/buffer.svg')}],
     [ELEMENT.OUT_CONTACT, {create: _.noop, icon: require('../assets/out-contact.svg')}],
     [ELEMENT.LABEL, {create: _.noop, icon: require('../assets/label.svg')}],
   ]);

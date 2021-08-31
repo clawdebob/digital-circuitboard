@@ -82,6 +82,7 @@ export class Wire extends DcbElement {
       // && this.wiredTo.length < 2
     ) {
       if (pin) {
+        pin.wiredTo = this;
         this.wiredTo.push({
           element,
           pin
