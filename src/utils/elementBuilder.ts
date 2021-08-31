@@ -11,6 +11,7 @@ import Xor from '../elements/Xor/xor';
 import Nxor from '../elements/Nxor/nxor';
 import Invertor from '../elements/Invertor/invertor';
 import Buffer from '../elements/Buffer/buffer';
+import Constant from '../elements/Constant/constant';
 
 interface BuilderData {
   create: any;
@@ -25,7 +26,7 @@ export default class elementBuilder {
     [ELEMENT.NAND, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nand(dimensions, props), icon: require('../assets/nand.svg')}],
     [ELEMENT.XOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Xor(dimensions, props), icon: require('../assets/xor.svg')}],
     [ELEMENT.NXOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nxor(dimensions, props), icon: require('../assets/nxor.svg')}],
-    [ELEMENT.CONSTANT, {create: _.noop, icon: require('../assets/const.svg')}],
+    [ELEMENT.CONSTANT, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Constant(dimensions, props), icon: require('../assets/const.svg')}],
     [ELEMENT.BUTTON, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Button(dimensions, props), icon: require('../assets/button.svg')}],
     [ELEMENT.JUNCTION, {create: _.noop, icon: null}],
     [ELEMENT.INVERTOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Invertor(dimensions, props), icon: require('../assets/invertor.svg')}],
