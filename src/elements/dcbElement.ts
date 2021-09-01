@@ -23,6 +23,7 @@ export interface Dimensions {
   y: number;
   originY: number;
   signatureSize?: number;
+  radius?: number;
 }
 
 export interface PositionData {
@@ -262,7 +263,7 @@ export abstract class DcbElement implements ElementParams {
       case true:
         return '1';
       default:
-        return 'x';
+        return '✕';
     }
   }
 

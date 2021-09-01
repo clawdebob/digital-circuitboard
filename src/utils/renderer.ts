@@ -53,21 +53,23 @@ class Renderer {
     const {props, dimensions} = element;
     const {fill} = props;
 
-    const rect = this.createRect(x, y - dimensions.originY, dimensions.width, dimensions.height);
+    const base = dimensions.radius ?
+      this.createCircle(x + dimensions.radius, y - dimensions.originY + dimensions.radius, dimensions.radius * 2) :
+      this.createRect(x, y - dimensions.originY, dimensions.width, dimensions.height);
 
     if (fill) {
-      rect.fill(fill);
+      base.fill(fill);
     }
 
-    rect.stroke('#000000');
+    base.stroke('#000000');
 
     if (isGhost) {
-      rect.opacity(0.5);
-      rect.addClass('ghost');
-      this.foreground.add(rect);
+      base.opacity(0.5);
+      base.addClass('ghost');
+      this.foreground.add(base);
     }
 
-    return rect;
+    return base;
   }
 
   private static createHelper(x: number, y: number): Circle {
@@ -250,10 +252,8 @@ class Renderer {
 
       text.attr('font-size', 24);
 
-      const {width} = text.node.getBoundingClientRect();
-
       text
-        .x(x + element.dimensions.width / 2 - width / 2)
+        .cx(x + element.dimensions.width / 2)
         .y(y);
 
       element.modelData.signatureModel = text;
