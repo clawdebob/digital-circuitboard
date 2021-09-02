@@ -1,8 +1,8 @@
-import {G, Element, Text} from '@svgdotjs/svg.js';
+import {Element, G, Text} from '@svgdotjs/svg.js';
 import {DIRECTION, ElementDirection, ElementOrientation, ORIENTATION} from '../types/consts/orientation.const';
 import {ElementProperties, ElementProperty} from '../types/consts/elementDetails.consts';
 import * as _ from 'lodash';
-import {Pin, PIN_TYPES_ENUM, Signal} from './Pin/pin';
+import {OVERLOAD_SIGNAL, Pin, PIN_TYPES_ENUM, Signal} from './Pin/pin';
 import {DcbElementName} from '../types/consts/element.consts';
 import {Subscription} from 'rxjs';
 import Renderer from '../utils/renderer';
@@ -299,9 +299,8 @@ export abstract class DcbElement implements ElementParams {
         return '#006200';
       case true:
         return '#00FF00';
-      // case 'overload':
-      //   stroke = '#ff7700';
-      //   break;
+      case OVERLOAD_SIGNAL:
+        return '#ff7700';
       case undefined:
         return '#0077ff';
       default:

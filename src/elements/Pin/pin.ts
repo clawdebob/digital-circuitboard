@@ -3,7 +3,8 @@ import {Line, Circle} from '@svgdotjs/svg.js';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {Wire} from '../Wire/wire';
 
-export type Signal = boolean | null | undefined;
+export const OVERLOAD_SIGNAL = 'overload';
+export type Signal = boolean | null | undefined | typeof OVERLOAD_SIGNAL;
 export type Wired = Wire | Pin | null;
 
 export enum PIN_TYPES_ENUM {

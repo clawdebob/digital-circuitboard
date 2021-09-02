@@ -13,6 +13,7 @@ import Invertor from '../elements/Invertor/invertor';
 import Buffer from '../elements/Buffer/buffer';
 import Constant from '../elements/Constant/constant';
 import OutContact from '../elements/OutContact/out-contact';
+import Label from '../elements/Label/label';
 
 interface BuilderData {
   create: any;
@@ -33,7 +34,7 @@ export default class elementBuilder {
     [ELEMENT.INVERTOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Invertor(dimensions, props), icon: require('../assets/invertor.svg')}],
     [ELEMENT.BUFFER, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Buffer(dimensions, props), icon: require('../assets/buffer.svg')}],
     [ELEMENT.OUT_CONTACT, {create: (dimensions?: Dimensions, props?: ElementProperties) => new OutContact(dimensions, props), icon: require('../assets/out-contact.svg')}],
-    [ELEMENT.LABEL, {create: _.noop, icon: require('../assets/label.svg')}],
+    [ELEMENT.LABEL, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Label(dimensions, props), icon: require('../assets/label.svg')}],
   ]);
 
   static getCreateFuncByName(name: DcbElementName): any {

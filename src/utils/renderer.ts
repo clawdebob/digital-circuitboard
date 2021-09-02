@@ -1,8 +1,9 @@
-import {Svg, G, Element, SVG, Rect, Circle, Line} from '@svgdotjs/svg.js';
+import {Circle, Element, G, Line, Rect, SVG, Svg} from '@svgdotjs/svg.js';
 import tile from '../assets/tile5px.png';
 import * as _ from 'lodash';
 import {DcbElement} from '../elements/dcbElement';
 import {Wire, WireHelper} from '../elements/Wire/wire';
+import {ELEMENT} from '../types/consts/element.consts';
 
 class Renderer {
   private static boardContainer: HTMLElement;
@@ -52,10 +53,13 @@ class Renderer {
   public static makeElementBase(element: DcbElement, x: number, y: number, isGhost = false): Element {
     const {props, dimensions} = element;
     const {fill} = props;
+    let base;
 
-    const base = dimensions.radius ?
-      this.createCircle(x + dimensions.radius, y - dimensions.originY + dimensions.radius, dimensions.radius * 2) :
-      this.createRect(x, y - dimensions.originY, dimensions.width, dimensions.height);
+    if (dimensions.radius) {
+      base = this.createCircle(x + dimensions.radius, y - dimensions.originY + dimensions.radius, dimensions.radius * 2);
+    } else {
+      base = this.createRect(x, y - dimensions.originY, dimensions.width, dimensions.height);
+    }
 
     if (fill) {
       base.fill(fill);
@@ -63,10 +67,33 @@ class Renderer {
 
     base.stroke('#000000');
 
+    if (element.name === ELEMENT.LABEL) {
+      base
+        .fill('transparent')
+        .stroke('transparent');
+    }
+
     if (isGhost) {
+      const ghost = this.svg.group();
+
       base.opacity(0.5);
-      base.addClass('ghost');
-      this.foreground.add(base);
+
+      if (element.signature && element.name === ELEMENT.LABEL) {
+        const text = this.background
+          .text(element.props.labelText || element.signature)
+          .attr('font-size', element.props.fontSize || 24)
+          .opacity(0.5)
+          .fill(String(element.props.fill))
+          .cx(x)
+          .cy(y);
+
+        ghost.add(text);
+      }
+
+      ghost.add(base);
+      this.foreground.add(ghost);
+
+      return ghost;
     }
 
     return base;
@@ -252,9 +279,19 @@ class Renderer {
 
       text.attr('font-size', 24);
 
-      text
-        .cx(x + element.dimensions.width / 2)
-        .y(y);
+      if (element.name === ELEMENT.LABEL) {
+        text
+          .text(String(element.props.labelText))
+          .fill(String(element.props.fill))
+          .attr('font-size', element.props.fontSize)
+          .cx(x)
+          .cy(y);
+      } else {
+        text
+          .cx(x + element.dimensions.width / 2)
+          .attr('font-size', 24)
+          .y(y);
+      }
 
       element.modelData.signatureModel = text;
 
