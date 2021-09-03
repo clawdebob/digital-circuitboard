@@ -2,7 +2,7 @@ import {DcbElementName, ELEMENT} from '../types/consts/element.consts';
 import And from '../elements/And/and';
 import * as _ from 'lodash';
 import Nand from '../elements/Nand/nand';
-import {Dimensions} from '../elements/dcbElement';
+import {DcbElement, Dimensions} from '../elements/dcbElement';
 import {ElementProperties} from '../types/consts/elementDetails.consts';
 import Button from '../elements/Button/button';
 import Or from '../elements/Or/or';
@@ -15,9 +15,11 @@ import Constant from '../elements/Constant/constant';
 import OutContact from '../elements/OutContact/out-contact';
 import Label from '../elements/Label/label';
 
+type createFunc = (dimensions?: Dimensions, props?: ElementProperties) => DcbElement;
+
 interface BuilderData {
-  create: any;
-  icon: any;
+  create: createFunc;
+  icon: NodeRequire;
 }
 
 export default class elementBuilder {
@@ -30,28 +32,27 @@ export default class elementBuilder {
     [ELEMENT.NXOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Nxor(dimensions, props), icon: require('../assets/nxor.svg')}],
     [ELEMENT.CONSTANT, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Constant(dimensions, props), icon: require('../assets/const.svg')}],
     [ELEMENT.BUTTON, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Button(dimensions, props), icon: require('../assets/button.svg')}],
-    [ELEMENT.JUNCTION, {create: _.noop, icon: null}],
     [ELEMENT.INVERTOR, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Invertor(dimensions, props), icon: require('../assets/invertor.svg')}],
     [ELEMENT.BUFFER, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Buffer(dimensions, props), icon: require('../assets/buffer.svg')}],
     [ELEMENT.OUT_CONTACT, {create: (dimensions?: Dimensions, props?: ElementProperties) => new OutContact(dimensions, props), icon: require('../assets/out-contact.svg')}],
     [ELEMENT.LABEL, {create: (dimensions?: Dimensions, props?: ElementProperties) => new Label(dimensions, props), icon: require('../assets/label.svg')}],
   ]);
 
-  static getCreateFuncByName(name: DcbElementName): any {
+  static getCreateFuncByName(name: DcbElementName): createFunc {
     const data = elementBuilder.elementMap.get(name);
 
     if (!data) {
-      return _.noop;
+      return _.noop as createFunc;
     }
 
     return data.create;
   }
 
-  static getIconByName(name: DcbElementName): any {
+  static getIconByName(name: DcbElementName): NodeRequire | null {
     const data = elementBuilder.elementMap.get(name);
 
     if (!data) {
-      return _.noop;
+      return null;
     }
 
     return data.icon;

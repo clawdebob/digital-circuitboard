@@ -8,7 +8,6 @@ export enum ELEMENT {
   WIRE = 'Wire',
   CONSTANT = 'Constant',
   BUTTON = 'Button',
-  JUNCTION = 'Junction',
   INVERTOR = 'Invertor',
   BUFFER = 'Buffer',
   OUT_CONTACT = 'OutContact',
@@ -24,7 +23,6 @@ export type DcbElementName = ELEMENT.OR
   | ELEMENT.WIRE
   | ELEMENT.CONSTANT
   | ELEMENT.BUTTON
-  | ELEMENT.JUNCTION
   | ELEMENT.INVERTOR
   | ELEMENT.BUFFER
   | ELEMENT.OUT_CONTACT
