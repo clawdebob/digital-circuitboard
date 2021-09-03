@@ -2,9 +2,11 @@ import React from 'react';
 import './action-panel.scss';
 import {BOARD_STATES_ENUM, BoardState} from '../../store/consts/boardStates.consts';
 import {useDispatch} from 'react-redux';
-import {setBoardState} from '../../store/actions/boardActions';
+import {setBoardState, setCurrentElement} from '../../store/actions/boardActions';
 import * as _ from 'lodash';
 import {useTranslation} from 'react-i18next';
+import {DcbElementName, ELEMENT} from '../../types/consts/element.consts';
+import elementBuilder from '../../utils/elementBuilder';
 
 enum PANEL_ACTION_ENUM {
   SET_BOARD_STATE = 'SET_BOARD_STATE',
@@ -17,14 +19,15 @@ interface PanelAction {
   title: string;
   type: PANEL_ACTION_ENUM;
   state?: BoardState;
+  element?: DcbElementName;
 }
 
 
 const MENU_ACTIONS: Array<PanelAction> = [
   {name: BOARD_STATES_ENUM.EDIT, icon: 'vaadin:cursor', title: 'action.edit', type: PANEL_ACTION_ENUM.SET_BOARD_STATE, state: BOARD_STATES_ENUM.EDIT},
   {name: BOARD_STATES_ENUM.INTERACT, icon: 'fa:hand-pointer-o', title: 'action.interact', type: PANEL_ACTION_ENUM.SET_BOARD_STATE, state: BOARD_STATES_ENUM.INTERACT},
-  {name: 'create-button', icon: 'twemoji:black-square-button', title: 'action.create-button', type: PANEL_ACTION_ENUM.CREATE_ELEMENT},
-  {name: 'create-outContact', icon: 'fxemoji:radiobutton', title: 'action.create-out-contact', type: PANEL_ACTION_ENUM.CREATE_ELEMENT},
+  {name: 'create-button', icon: 'twemoji:black-square-button', title: 'action.create-button', type: PANEL_ACTION_ENUM.CREATE_ELEMENT, element: ELEMENT.BUTTON},
+  {name: 'create-outContact', icon: 'fxemoji:radiobutton', title: 'action.create-out-contact', type: PANEL_ACTION_ENUM.CREATE_ELEMENT, element: ELEMENT.OUT_CONTACT},
 ];
 
 const ActionPanel = (): React.ReactElement => {
@@ -34,6 +37,12 @@ const ActionPanel = (): React.ReactElement => {
   const execAction = (action: PanelAction) => {
     switch (action.type) {
       case PANEL_ACTION_ENUM.CREATE_ELEMENT:
+        if (action.element) {
+          const create = elementBuilder.getCreateFuncByName(action.element);
+
+          dispatch(setCurrentElement(create()));
+          dispatch(setBoardState(BOARD_STATES_ENUM.CREATE));
+        }
         break;
       case PANEL_ACTION_ENUM.SET_BOARD_STATE:
         if (action.state) {
