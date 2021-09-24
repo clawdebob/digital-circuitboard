@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import {useTranslation} from 'react-i18next';
 import {DcbElementName, ELEMENT} from '../../types/consts/element.consts';
 import elementBuilder from '../../utils/elementBuilder';
+import store from '../../store/store';
 
 enum PANEL_ACTION_ENUM {
   SET_BOARD_STATE = 'SET_BOARD_STATE',
@@ -39,8 +40,17 @@ const ActionPanel = (): React.ReactElement => {
       case PANEL_ACTION_ENUM.CREATE_ELEMENT:
         if (action.element) {
           const create = elementBuilder.getCreateFuncByName(action.element);
+          const cache = store.getState().board.propsCache[action.element];
+          const element = cache ? create(cache.dimensions, cache.props): create();
 
-          dispatch(setCurrentElement(create()));
+          if (cache) {
+            element.inPins = _.map(cache.pinInversions, (invert: boolean, idx: number) => ({
+              ...element.inPins[idx],
+              invert,
+            }));
+          }
+
+          dispatch(setCurrentElement(element));
           dispatch(setBoardState(BOARD_STATES_ENUM.CREATE));
         }
         break;
