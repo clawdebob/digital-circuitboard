@@ -5,17 +5,13 @@ import {Element, Line} from '@svgdotjs/svg.js';
 import {DcbElement} from '../../../elements/dcbElement';
 import React from 'react';
 import * as _ from 'lodash';
-import {filter} from 'rxjs/operators';
+import {filter, switchMap} from 'rxjs/operators';
 import {Pin, PIN_TYPES_ENUM} from '../../../elements/Pin/pin';
 import store from '../../../store/store';
 import {setBoardState} from '../../../store/actions/boardActions';
 import {Wire} from '../../../elements/Wire/wire';
 import {ORIENTATION} from '../../../types/consts/orientation.const';
-import {
-  setSchemeData,
-  setSchemeElements,
-  setSchemeWires
-} from '../../../store/actions/schemeDataActions';
+import {setSchemeData, setSchemeElements, setSchemeWires} from '../../../store/actions/schemeDataActions';
 import {SchemeDataState} from '../../../store/consts/schemeDataStates.consts';
 import elementBuilder from '../../../utils/elementBuilder';
 
@@ -92,7 +88,43 @@ export class BoardInteractor {
     _.set(window, 'elements', this.elementsList);
     _.set(window, 'wires', this.wiresList);
 
+    fromEvent(document, 'mouseup')
+      .subscribe(() => {
+        this.resetAllSelections();
+      });
+
     this.svg = Renderer.svg.node;
+
+    fromEvent<React.KeyboardEvent>(document, 'keydown')
+      .pipe(
+        filter(() => this.boardState === BOARD_STATES_ENUM.EDIT),
+      ).subscribe(e => {
+        const selectionList = this.elementsList.filter(element => element.isSelected);
+
+        switch (e.key) {
+          case 'Delete':
+            this.resetAllSelections();
+
+            _.forEach(selectionList, element => {
+              element.delete();
+
+              this.elementsList.splice(_.indexOf(this.elementsList, element), 1);
+            });
+
+            break;
+          default:
+            break;
+        }
+      });
+  }
+
+  private static resetAllSelections(): void {
+    _.forEach(this.elementsList, el => {
+      if (el.isSelected) {
+        this.toggleSelection(el);
+        el.isSelected = false;
+      }
+    });
   }
 
   private static resetBoardFields(): void {
@@ -262,8 +294,37 @@ export class BoardInteractor {
     this.applyJunctionHelpers(wire);
   }
 
+  private static toggleSelection(element: DcbElement) {
+    element.isSelected = !element.isSelected;
+
+    if (element.isSelected) {
+      element.selectionZone = Renderer.applySelection(element);
+    } else if (element.selectionZone) {
+      element.selectionZone.remove();
+    }
+  }
+
   private static applyHelperEvents(element: DcbElement): void {
     const pins = _.union(element.inPins, element.outPins);
+    const model = element.modelData.model;
+
+    if (model) {
+      const selectEvent$ = fromEvent<React.MouseEvent>(model.node, 'mousedown')
+        .pipe(
+          switchMap(() => fromEvent<React.MouseEvent>(model.node, 'mouseup')),
+          filter(() => this.boardState === BOARD_STATES_ENUM.EDIT)
+        ).subscribe(e => {
+          e.stopPropagation();
+
+          const selection = element.isSelected;
+
+          this.resetAllSelections();
+          element.isSelected = selection;
+          this.toggleSelection(element);
+        });
+
+      element.subscriptions.add(selectEvent$);
+    }
 
     _.forEach(pins, pin => {
       const {helper} = pin;

@@ -32,8 +32,6 @@ class Or extends DcbElement {
 
 
   public operation(): void {
-    console.log(this.outPins[0].value);
-
     this.outPins[0].value = _.reduce(
       this.inPins,
       (acc: boolean, pin) => acc || Boolean(pin.value),

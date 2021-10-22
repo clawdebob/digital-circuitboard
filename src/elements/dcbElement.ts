@@ -6,6 +6,7 @@ import {OVERLOAD_SIGNAL, Pin, PIN_TYPES_ENUM, Signal} from './Pin/pin';
 import {DcbElementName} from '../types/consts/element.consts';
 import {Subscription} from 'rxjs';
 import Renderer from '../utils/renderer';
+import {Wire} from './Wire/wire';
 
 const PIN_LENGTH = 12;
 const DEFAULT_DIMENSIONS = {
@@ -50,6 +51,7 @@ export interface ElementParams {
   props: ElementProperties;
   editableProps: Array<ElementProperty>;
   positionData: PositionData;
+  selectionZone: G | undefined;
   maxContacts: number;
   operation: () => void;
   updateState: (signal?: Signal) => void;
@@ -75,6 +77,7 @@ export abstract class DcbElement implements ElementParams {
   public outPins: Array<Pin>;
   public signature?: string;
   public subscriptions = new Subscription();
+  public selectionZone: G | undefined;
 
   protected constructor(
     name: DcbElementName,
@@ -305,6 +308,25 @@ export abstract class DcbElement implements ElementParams {
         return '#0077ff';
       default:
         return '#FF0000';
+    }
+  }
+
+  public delete(): void {
+    const pins = _.chain(this.inPins)
+      .union(this.outPins)
+      .filter(pin => Boolean(pin.wiredTo))
+      .value();
+
+    if (this.modelData.model) {
+      this.modelData.model.remove();
+    }
+
+    if (pins.length) {
+      _.forEach(pins, pin => {
+        if (pin.wiredTo instanceof Wire) {
+          pin.wiredTo.removeWiredElement(this);
+        }
+      });
     }
   }
 }

@@ -333,9 +333,10 @@ export class Wire extends DcbElement {
 
   public removeWiredElement(element: DcbElement): void {
     const wiredData = _.find(this.wiredTo, item => item.element.id === element.id);
-    const {coords, orientation} = element.positionData;
+    const {coords} = element.positionData;
+    const orientation = element instanceof Wire ? element.positionData.orientation : ORIENTATION.VERTICAL;
 
-    if (wiredData && !wiredData.viaJunction && element instanceof Wire) {
+    if (wiredData && !wiredData.viaJunction) {
       const closestHelper = this.getClosestHelper(this.helpers, coords, orientation);
 
       if (closestHelper) {
@@ -350,10 +351,13 @@ export class Wire extends DcbElement {
     }
 
     // TO-DO update when delete will be implemented
-    this.wiredTo = _.filter(this.wiredTo, item => item.element.id !== element.id);
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
 
-    _.forEach(this.wiredTo, item => this.wireTo(item.element, item.pin));
+    const elementsToWire = _.filter(this.wiredTo, item => item.element.id !== element.id);
+
+    this.wiredTo = [];
+
+    _.forEach(elementsToWire, item => this.wireTo(item.element, item.pin));
   }
 }

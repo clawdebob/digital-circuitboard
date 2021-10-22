@@ -50,6 +50,31 @@ class Renderer {
       .y(y  - diameter / 2);
   }
 
+  public static applySelection(element: DcbElement): G {
+    const zoneGroup = this.svg.group();
+    const rectWidth = 7;
+    const {x, y, width, height, originY} = element.dimensions;
+    const zoneCoords = [
+      {x: x - rectWidth, y: y - originY - rectWidth},
+      {x: x - rectWidth, y: y + height - originY},
+      {x: x + width, y: y - originY - rectWidth},
+      {x: x + width, y: y + height - originY},
+    ];
+
+    _.forEach(zoneCoords, coords => {
+      const rect = this.svg.rect(rectWidth, rectWidth)
+        .fill('#ffffff')
+        .stroke('#000000')
+        .attr('shape-rendering', 'crispedges')
+        .x(coords.x)
+        .y(coords.y);
+
+      zoneGroup.add(rect);
+    });
+
+    return zoneGroup;
+  }
+
   public static makeElementBase(element: DcbElement, x: number, y: number, isGhost = false): Element {
     const {props, dimensions} = element;
     const {fill} = props;
