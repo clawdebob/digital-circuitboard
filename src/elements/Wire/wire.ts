@@ -91,17 +91,27 @@ export class Wire extends DcbElement {
         const [{x: ex, y: ey}] = coords;
 
         const closestHelper = _.minBy(this.helpers,
-            helper => Math.abs(Math.pow(ex - helper.model.x(), 2) - Math.pow(ey - helper.model.y(), 2))
-        );
+          helper => {
+            const helperX = helper.model.x() as number;
+            const helperY = helper.model.y() as number;
+
+            return Math.abs(Math.pow(ex - helperX, 2) - Math.pow(ey - helperY, 2));
+        });
 
         if (closestHelper) {
           this.toggleHelper(closestHelper, false);
 
           const helperModel = closestHelper.model;
 
-          const junctionHelper = _.minBy(this.junctionHelpers, helper =>
-            Math.abs(Math.pow(helperModel.x() - helper.model.x(), 2) - Math.pow(helperModel.y() - helper.model.y(), 2))
-          );
+          const junctionHelper = _.minBy(this.junctionHelpers, helper => {
+            const modelX = helperModel.x() as number;
+            const modelY = helperModel.y() as number;
+            const helperX = helper.model.x() as number;
+            const helperY = helper.model.y() as number;
+
+            return Math.abs(Math.pow(modelX - helperX, 2)
+                - Math.pow(modelY - helperY, 2));
+          });
 
           if (junctionHelper) {
             this.toggleHelper(junctionHelper);

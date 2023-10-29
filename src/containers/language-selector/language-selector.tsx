@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {MouseEvent, useEffect, useState} from 'react';
 import {useCookies} from 'react-cookie';
 import {useTranslation} from 'react-i18next';
 import {useDispatch} from 'react-redux';
@@ -28,10 +28,10 @@ const LanguageSelector = (): React.ReactElement => {
   const {t} = useTranslation();
   const dispatch = useDispatch();
 
-  const toggleSelector = () => {
-    const visibility = !isMenuVisible;
+  const toggleSelector = (event: MouseEvent) => {
+    event.stopPropagation();
 
-    setMenuVisibility(visibility);
+    setMenuVisibility(!isMenuVisible);
   };
 
   const changeLanguage = (language: string) => {
@@ -44,7 +44,7 @@ const LanguageSelector = (): React.ReactElement => {
     setLanguage(language);
 
     if (isMenuVisible) {
-      toggleSelector();
+      setMenuVisibility(false);
     }
   };
 
@@ -52,7 +52,7 @@ const LanguageSelector = (): React.ReactElement => {
     const clickSubscription = fromEvent(document, 'click')
       .subscribe(() => {
         if (isMenuVisible) {
-          toggleSelector();
+          setMenuVisibility(false);
         }
       });
 

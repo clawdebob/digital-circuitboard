@@ -6,12 +6,12 @@ import MainMenu from './containers/main-menu/main-menu';
 import SideMenu from './containers/side-menu/side-menu';
 import ActionPanel from './containers/action-panel/action-panel';
 import Popup from './containers/popup/popup';
-import {Switch, Route, useHistory} from 'react-router-dom';
+import {Routes, Route, useNavigate} from 'react-router-dom';
 import {FileManager} from './utils/fileManager';
 import FileInput from './containers/file-input/file-input';
 
 function App(): React.ReactElement {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const MAIN_MENU_OPTIONS = [
     {
@@ -25,9 +25,9 @@ function App(): React.ReactElement {
     {
       name: 'Google Drive',
       subOptions: [
-        {name: 'gdrive.manage', action: () => history.push('/auth')},
-        {name: 'main-menu.options.file.open', action: () => history.push('/g-drive')},
-        {name: 'main-menu.options.file.save', action: () => history.push('/g-drive')}
+        {name: 'gdrive.manage', action: () => navigate('/auth')},
+        {name: 'main-menu.options.file.open', action: () => navigate('/g-drive')},
+        {name: 'main-menu.options.file.save', action: () => navigate('/g-drive')}
       ]
     },
     {
@@ -40,7 +40,7 @@ function App(): React.ReactElement {
   ];
 
   const closePopup = () => {
-    history.push('/');
+    navigate('/');
   };
 
   return (
@@ -51,18 +51,31 @@ function App(): React.ReactElement {
         <SideMenu/>
         <Board/>
       </div>
-      <Switch>
-        <Route path="/g-drive">
-          <Popup close={closePopup} isVisible={true}>
-            <h1>Disk FS</h1>
-          </Popup>
+      <Routes>
+        <Route
+          path="/"
+          element={<></>}
+        >
         </Route>
-        <Route path="/auth">
-          <Popup close={closePopup} isVisible={true}>
-            <h1>Auth</h1>
-          </Popup>
+        <Route
+          path="/g-drive"
+          element={
+            <Popup close={closePopup} isVisible={true}>
+              <h1>Disk FS</h1>
+            </Popup>
+          }
+        >
         </Route>
-      </Switch>
+        <Route
+          path="/auth"
+          element={
+            <Popup close={closePopup} isVisible={true}>
+              <h1>Auth</h1>
+            </Popup>
+          }
+        >
+        </Route>
+      </Routes>
       <FileInput/>
     </div>
   );

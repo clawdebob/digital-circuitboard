@@ -755,7 +755,7 @@ export class BoardInteractor {
 
     // Phase 2: Wiring process
     _.forEach(wiresList, (wire, idx) => {
-      _.forEach(wires[idx].wiredTo, (wired, idx) => {
+      _.forEach(wires[idx].wiredTo, wired => {
         const id = wired.element;
         const element = _.find(this.elementsList, {id})
           || _.find(wiresList, {id});

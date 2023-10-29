@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './index.scss';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -7,8 +6,11 @@ import {Provider} from 'react-redux';
 import './api/i18n';
 import store from './store/store';
 import {BrowserRouter} from 'react-router-dom';
+import {createRoot} from 'react-dom/client';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root') as Element);
+
+root.render(
   <React.StrictMode>
     <BrowserRouter>
       <Provider store={store}>
@@ -16,7 +18,6 @@ ReactDOM.render(
       </Provider>
     </BrowserRouter>
   </React.StrictMode>,
-  document.getElementById('root')
 );
 
 reportWebVitals();

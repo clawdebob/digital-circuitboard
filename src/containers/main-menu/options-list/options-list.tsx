@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, MouseEvent} from 'react';
 import {fromEvent} from 'rxjs';
 import {useTranslation} from 'react-i18next';
 import SubList from '../sub-options-list/sub-options-list';
@@ -14,17 +14,17 @@ const OptionsList = (props: OptionsListProps): React.ReactElement => {
   const {t} = useTranslation();
   const classState = areSubOptionsVisible ? 'opened' : 'closed';
 
-  const toggleMenu = () => {
-    const visibility = !areSubOptionsVisible;
+  const toggleMenu = (event: MouseEvent) => {
+    event.stopPropagation();
 
-    setSubOptionsVisibility(visibility);
+    setSubOptionsVisibility(!areSubOptionsVisible);
   };
 
   useEffect(() => {
     const clickSubscription = fromEvent(document, 'click')
       .subscribe(() => {
         if (areSubOptionsVisible) {
-          toggleMenu();
+          setSubOptionsVisibility(false);
         }
       });
 
