@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import {useTranslation} from 'react-i18next';
 import {connect, useDispatch} from 'react-redux';
 import {setBoardState, setCurrentElement} from '../../../../store/actions/boardActions';
-import {BOARD_STATES_ENUM} from '../../../../store/consts/boardStates.consts';
+import {BOARD_STATES_ENUM, StoreBoardState} from '../../../../store/consts/boardStates.consts';
 import {OptionsMap} from '../../../../types/menuCache.type';
 import {RootState} from '../../../../types/consts/states.consts';
 
@@ -14,9 +14,11 @@ export interface ElementGroupElementsProps {
   className?: string;
 }
 
-const ElementGroupElements = (props: ElementGroupElementsProps): React.ReactElement => {
+const ElementGroupElements = (props: ElementGroupElementsProps & Partial<StoreBoardState>): React.ReactElement => {
   const {t} = useTranslation();
   const dispatch = useDispatch();
+
+  console.log(props.currentElement);
 
   const handleClick = (elementBase: ElementBase) => {
     dispatch(setBoardState(BOARD_STATES_ENUM.CREATE));
@@ -39,7 +41,7 @@ const ElementGroupElements = (props: ElementGroupElementsProps): React.ReactElem
   const elementsList = _.map(props.elements, (element, idx) => (
     <div
       key={idx}
-      className="element"
+      className={`element ${props.currentElement?.name === element.elementName ? 'element--selected' : ''}`}
       title={t(element.name)}
       onClick={() => handleClick(element)}
     >

@@ -91,6 +91,13 @@ $arrow-color: darkslategrey;
           min-width: 100px;
           position: relative;
 
+          &__selection {
+            color: $success;
+            position: relative;
+            top: 3px;
+            font-weight: bold;
+          }
+
           &:hover {
             background-color: $menu-hover;
             cursor: pointer;
@@ -112,6 +119,11 @@ $arrow-color: darkslategrey;
           margin: 5px;
           display: inline-block;
           cursor: pointer;
+
+          &--selected {
+            border-color: $success;
+            outline: 2px solid $success;
+          }
 
           &:hover {
             background-color: $menu-hover;
