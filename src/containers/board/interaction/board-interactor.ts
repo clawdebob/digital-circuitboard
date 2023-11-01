@@ -775,6 +775,12 @@ export class BoardInteractor {
     _.set(window, 'wires', this.wiresList);
   }
 
+  public static hideGhosts(): void {
+    this.ghost?.remove();
+    this.wiresToBuildModels.main?.remove();
+    this.wiresToBuildModels.bend?.remove();
+  }
+
   public static setState(boardState: BoardState, element: DcbElement | null): void {
     this.resetBoardFields();
     this.currentElement = element;

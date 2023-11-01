@@ -50,6 +50,7 @@ const Board = (props: BoardProps) => {
     <div
       className="board__container"
       ref={boardContainer}
+      onMouseLeave={BoardInteractor.hideGhosts.bind(BoardInteractor)}
     >
       <div
         ref={boardWrapper}
