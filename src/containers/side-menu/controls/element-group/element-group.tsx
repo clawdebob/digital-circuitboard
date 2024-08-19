@@ -26,7 +26,7 @@ const ElementGroup = (props: ElementGroupProps): React.ReactElement => {
         onClick={handleClick}
       >
         <span>{t(group.name)}</span>
-        <div className={'arrow'}/>
+        <div className="arrow"/>
       </div>
       <ElementGroupElements
         elements={group.elements}

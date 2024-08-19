@@ -18,8 +18,6 @@ const ElementGroupElements = (props: ElementGroupElementsProps & Partial<StoreBo
   const {t} = useTranslation();
   const dispatch = useDispatch();
 
-  console.log(props.currentElement);
-
   const handleClick = (elementBase: ElementBase) => {
     dispatch(setBoardState(BOARD_STATES_ENUM.CREATE));
 
