@@ -54,6 +54,7 @@ export interface ElementParams {
   selectionZone: G | undefined;
   maxContacts: number;
   operation: () => void;
+  // eslint-disable-next-line no-unused-vars
   updateState: (signal?: Signal) => void;
   subscriptions: Subscription;
   inPins: Array<Pin>;
@@ -314,7 +315,6 @@ export abstract class DcbElement implements ElementParams {
   public delete(): void {
     const pins = _.chain(this.inPins)
       .union(this.outPins)
-      .filter(pin => Boolean(pin.wiredTo))
       .value();
 
     if (this.modelData.model) {
@@ -323,6 +323,8 @@ export abstract class DcbElement implements ElementParams {
 
     if (pins.length) {
       _.forEach(pins, pin => {
+        pin.helper?.remove();
+
         if (pin.wiredTo instanceof Wire) {
           pin.wiredTo.removeWiredElement(this);
         }

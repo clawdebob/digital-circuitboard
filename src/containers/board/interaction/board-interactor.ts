@@ -1,4 +1,4 @@
-import {fromEvent, Subscription} from 'rxjs';
+import {debounceTime, fromEvent, Subscription, tap} from 'rxjs';
 import Renderer from '../../../utils/renderer';
 import {BOARD_STATES_ENUM, BoardState} from '../../../store/consts/boardStates.consts';
 import {Element, Line} from '@svgdotjs/svg.js';
@@ -88,6 +88,15 @@ export class BoardInteractor {
     _.set(window, 'elements', this.elementsList);
     _.set(window, 'wires', this.wiresList);
 
+    fromEvent(window, 'resize')
+      .pipe(
+        debounceTime(200),
+      )
+      .subscribe(() => {
+        Renderer.resetBoardDimensions();
+        Renderer.updateBoardDimensions();
+      });
+
     fromEvent(document, 'mouseup')
       .subscribe(() => {
         this.resetAllSelections();
@@ -110,6 +119,9 @@ export class BoardInteractor {
 
               this.elementsList.splice(_.indexOf(this.elementsList, element), 1);
             });
+
+            Renderer.resetBoardDimensions();
+            Renderer.updateBoardDimensions();
 
             break;
           default:

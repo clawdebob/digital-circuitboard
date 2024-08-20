@@ -5,6 +5,7 @@ import {fromEvent} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 import './side-menu.scss';
 import ElementDetails from './controls/element-details/element-details';
+import Renderer from '../../utils/renderer';
 
 interface Slider {
   column: HTMLElement | null,
@@ -34,6 +35,7 @@ const SideMenu = (): React.ReactElement => {
         map((e: MouseEvent) => handleMouseMove(e, slider)),
         switchMap(() => fromEvent(document, 'mouseup')),
       ).subscribe(() => {
+        Renderer.updateBoardDimensions();
         sliderResize$.unsubscribe();
       });
   };
@@ -48,7 +50,7 @@ const SideMenu = (): React.ReactElement => {
       menuInitialWidth.current = menuWidth;
     }
 
-    if(!slider.column) {
+    if (!slider.column) {
       return;
     }
 
@@ -57,6 +59,8 @@ const SideMenu = (): React.ReactElement => {
     } else {
       slider.column.style.width = `${slider.width}px`;
     }
+
+    Renderer.resetBoardDimensions();
   };
 
   useEffect(() => {

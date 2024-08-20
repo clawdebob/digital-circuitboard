@@ -15,9 +15,9 @@ class Renderer {
 
   public static init(element: HTMLElement): void {
     this.boardContainer = element;
-    this.svg = SVG()
-      .addTo(element)
-      .size(2000, 2000);
+    this.svg = SVG().addTo(element);
+
+    this.resetBoardDimensions();
 
     this.svg.defs()
       .pattern(12,12)
@@ -331,6 +331,32 @@ class Renderer {
     };
 
     this.background.add(group);
+    Renderer.updateBoardDimensions();
+    group.node.scrollIntoView();
+  }
+
+  public static resetBoardDimensions(): void {
+    this.svg
+      .attr('height', '100%')
+      .attr('width', '100%');
+  }
+
+  public static updateBoardDimensions(): void {
+    const boardRect = this.board.node.getBoundingClientRect();
+    const svgRect = this.svg.node.getBoundingClientRect();
+    const containerRect = this.boardContainer.getBoundingClientRect();
+
+    if (boardRect.y + boardRect.height > containerRect.y + containerRect.height) {
+      const newHeight = Math.abs(svgRect.y - boardRect.y) + boardRect.height + 100;
+
+      this.svg.height(newHeight);
+    }
+
+    if (boardRect.x + boardRect.width > containerRect.x + containerRect.width) {
+      const newWidth = Math.abs(svgRect.x - boardRect.x) + boardRect.width + 100;
+
+      this.svg.width(newWidth);
+    }
   }
 
   // public static setBoardZoom(zoom: number, mouseX: number, mouseY: number): void {
