@@ -1,5 +1,4 @@
 import {Circle, Element, G, Line, Rect, SVG, Svg} from '@svgdotjs/svg.js';
-import tile from '../assets/tile5px.png';
 import * as _ from 'lodash';
 import {DcbElement} from '../elements/dcbElement';
 import {Wire, WireHelper} from '../elements/Wire/wire';
@@ -19,11 +18,27 @@ class Renderer {
 
     this.resetBoardDimensions();
 
-    this.svg.defs()
+    const pattern = this.svg.defs()
       .pattern(12,12)
-      .id('grid-pattern')
-      .image(tile)
-      .size(12,12);
+      .id('grid-pattern');
+
+    pattern
+      .rect(12, 12)
+      .fill('#fff');
+
+    pattern
+      .rect(2, 2)
+      .x(5)
+      .y(5)
+      .fill('#A8A8A8');
+
+    this.svg.group()
+      .rect()
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .x(0)
+      .y(0)
+      .fill('url(#grid-pattern)');
 
     this.board = this.svg.group();
 
