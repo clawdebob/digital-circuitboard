@@ -12,7 +12,8 @@ const boardReducer = (state: StoreBoardState = initialState, action: StoreAction
     case ACTIONS_ENUM.SET_BOARD_STATE:
       return {
         ...state,
-        boardState: action.payload
+        boardState: action.payload,
+        currentElement: [BOARD_STATES_ENUM.CREATE].includes(action.payload) ? state.currentElement : null,
       };
     case ACTIONS_ENUM.SET_CURRENT_ELEMENT:
       return {
